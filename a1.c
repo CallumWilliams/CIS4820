@@ -211,7 +211,15 @@ void mouse(int button, int state, int x, int y) {
    printf("%d %d\n", x, y);
 }
 
+buildFloor() {
+   
+   
+   
+}
+
 void buildPillars() {
+   
+   int i, j, k;
    
    /* build purple pillars */
    for (i = 1; i <= 6; i++) {
@@ -226,6 +234,7 @@ void buildPillars() {
 
 void buildMap() {
    
+   buildFloor();
    buildPillars();
    
 }
@@ -257,14 +266,12 @@ int i, j, k;
          }
       }
       
-      buildMap();
-      
 	/* create some green and blue cubes */
-      /*world[50][25][50] = 1;
+      world[50][25][50] = 1;
       world[49][25][50] = 1;
       world[49][26][50] = 1;
       world[52][25][52] = 2;
-      world[52][26][52] = 2;*/
+      world[52][26][52] = 2;
 
 	/* blue box shows xy bounds of the world */
       for(i=0; i<WORLDX-1; i++) {
@@ -285,8 +292,22 @@ int i, j, k;
       createPlayer(0, 52.0, 27.0, 52.0, 0.0);
 
    } else {
-
-	/* your code to build the world goes here */
+      
+      /* build ground (same as -testworld)*/
+      for(i = 0; i < WORLDX; i++) {
+         for(j = 0; j < WORLDZ; j++) {
+            world[i][24][j] = 3;
+         }
+      }
+      
+      /* build purple pillars */
+      for (i = 1; i <= 6; i++) {
+         for (j = 1; j < 6; j++) {
+            for (k = 0; k < 5; k++) {
+               world[i*15][k+25][j*15] = 6;
+            }
+         }
+      }
 
    }
 
