@@ -14,11 +14,11 @@
 #include "graphics.h"
 
 typedef struct PULSAR_WALL {
-   
-   static int STARTX, STARTZ;
-   static int ENDX, ENDZ;
-   static int orientation; //0 = horizontal, 1 = vertical
-   
+
+   int STARTX, STARTZ;
+   int ENDX, ENDZ;
+   int orientation; //0 = horizontal, 1 = vertical
+
 }Walls;
 
 	/* mouse function called by GLUT when a button is pressed or released */
@@ -71,7 +71,7 @@ extern int space;
 	/* flag indicates the program is a client when set = 1 */
 extern int netClient;
 	/* flag indicates the program is a server when set = 1 */
-extern int netServer; 
+extern int netServer;
 	/* size of the window in pixels */
 extern int screenWidth, screenHeight;
 	/* flag indicates if map is to be printed */
@@ -96,7 +96,7 @@ extern void tree(float, float, float, float, float, float, int);
 void collisionResponse() {
 
 	/* your collision code goes here */
-	
+
 
 }
 
@@ -138,9 +138,9 @@ void draw2D() {
 void update() {
 int i, j, k;
 float *la;
-    
-    static float mobSpeed = 0.1; //variable for mob speed 
-    
+
+    static float mobSpeed = 0.1; //variable for mob speed
+
 	/* sample animation for the test world, don't remove this code */
 	/* -demo of animating mobs */
    if (testWorld) {
@@ -162,7 +162,7 @@ float *la;
 	/* move mob 0 in the x axis */
       if (increasingmob0 == 1)
          mob0x += 0.2;
-      else 
+      else
          mob0x -= 0.2;
       if (mob0x > 50) increasingmob0 = 0;
       if (mob0x < 30) increasingmob0 = 1;
@@ -195,28 +195,24 @@ float *la;
    } else {
 
       /* Assignment Update Code */
-	  
+
 	  /* camera positioning */
-	  static float camera_x = -5, camera_y = -25, camera_z = -5;
-	  static float camera_rotx = 0, camera_roty = 180, camera_rotz = 0;
-	  
-	  setViewPosition(camera_x, camera_y, camera_z);
-	  setViewOrientation(camera_rotx, camera_roty, camera_rotz);
-	  
+
+
 	  /* Mob 0 */
       static float mob0_x = 25, mob0_y = 25, mob0_z = 25;
       static float mob0_rot = -90;
       static int incMob0 = 1;
-      
-      setMobPosition(0, mob0_x, mob0_y, mob0_z, mob0_rot); 
-      
+
+      setMobPosition(0, mob0_x, mob0_y, mob0_z, mob0_rot);
+
       /* Mob 1 */
       static float mob1_x = 25, mob1_y = 27, mob1_z = 35;
       static float mob1_rot = 0;
       static int incMob1 = 1;
-      
+
       setMobPosition(1, mob1_x, mob1_y, mob1_z, mob1_rot);
-      
+
    }
 }
 
@@ -225,7 +221,7 @@ float *la;
 	/* -button indicates which button was pressed or released */
 	/* -state indicates a button down or button up event */
 	/* -x,y are the screen coordinates when the mouse is pressed or */
-	/*  released */ 
+	/*  released */
 void mouse(int button, int state, int x, int y) {
 
    if (button == GLUT_LEFT_BUTTON)
@@ -241,6 +237,30 @@ void mouse(int button, int state, int x, int y) {
       printf("down - ");
 
    printf("%d %d\n", x, y);
+}
+
+void drawWall(Walls w) {
+
+   int i, j;
+
+   if (w.orientation == 0) {//horizontal
+
+      for (i = w.STARTX+1; i < w.ENDX; i++) {
+         for (j = 25; j < 30; j++) {
+            world[i][j][w.STARTZ] = 2;
+         }
+      }
+
+   } else {//vertical
+
+      for (i = w.STARTZ+1; i < w.ENDZ; i++) {
+         for (j = 25; j < 30; j++) {
+            world[w.STARTX][j][i] = 2;
+         }
+      }
+
+   }
+
 }
 
 int main(int argc, char** argv)
@@ -269,7 +289,7 @@ int i, j, k;
             world[i][24][j] = 3;
          }
       }
-      
+
 	/* create some green and blue cubes */
       world[50][25][50] = 1;
       world[49][25][50] = 1;
@@ -296,18 +316,16 @@ int i, j, k;
       createPlayer(0, 52.0, 27.0, 52.0, 0.0);
 
    } else {
-      
+
       /* Assignment Code */
-      Walls V_Walls[6][5];
-      Walls H_Walls[5][6];
-      
+
       /* build ground (same as -testworld) */
       for (i = 0; i < WORLDX; i++) {
          for (j = 0; j < WORLDZ; j++) {
             world[i][24][j] = 3;
          }
       }
-      
+
       /* boundary box */
       for (i = 0; i < WORLDX-1; i++) {
          for (j = 25; j < 30; j++) {
@@ -321,7 +339,7 @@ int i, j, k;
             world[WORLDX-1][j][i] = 2;
          }
       }
-      
+
       /* build purple pillars */
       for (i = 1; i <= 6; i++) {
          for (j = 1; j < 6; j++) {
@@ -330,38 +348,55 @@ int i, j, k;
             }
          }
       }
-      
+
+      Walls V_Walls[6][6];
+      Walls H_Walls[6][6];
+
+      /* set vertical wall positions */
+      for (i = 0; i < 6; i++) {
+         for (j = 0; j < 6; j++) {
+            V_Walls[i][j].STARTX = (i*15) + 15;
+            V_Walls[i][j].STARTZ = j*15;
+            V_Walls[i][j].ENDX = V_Walls[i][j].STARTX;
+            V_Walls[i][j].ENDZ = (j*15) + 15;
+            V_Walls[i][j].orientation = 1;
+         }
+      }
+
+      /* set horizontal wall positions */
       for (i = 0; i < 6; i++) {
          for (j = 0; j < 5; j++) {
-            V_WALLS[i][j].STARTX = i;
-            V_WALLS[i][j].STARTZ = (j*15) + 15;
-            V_WALLS[i][j].ENDX = i + 15;
-            V_WALLS[i][j].ENDZ = (j*15) + 30;
+            H_Walls[i][j].STARTX = i*15;
+            H_Walls[i][j].STARTZ = (j*15) + 15;
+            H_Walls[i][j].ENDX = (i*15) + 15;
+            H_Walls[i][j].ENDZ = H_Walls[i][j].STARTZ;
+            H_Walls[i][j].orientation = 0;
          }
       }
-      
-      /* set horizontal wall positions */
-      for (i = 0; i < 5; i++) {
+
+      for (i = 0; i < 6; i++) {
          for (j = 0; j < 6; j++) {
-            H_WALLS[i][j].STARTX = (i*15) + 15;
-            H_WALLS[i][j].STARTZ = j;
-            H_WALLS[i][j].ENDX = (i*15) + 30;
-            H_WALLS[i][j].ENDZ = j + 15;
-            H_WALLS[i][j].orientation = 0;
+            drawWall(V_Walls[i][j]);
          }
       }
-      
+
+      for (i = 0; i < 6; i++) {
+         for (j = 0; j < 5; j++) {
+            drawWall(H_Walls[i][j]);
+         }
+      }
+
       /* place player/entities */
       createPlayer(0, 7, 25, 7, 0);
       createMob(0, 25, 25, 25, -90);
       createMob(1, 25, 27, 35, 0);
-      
+      createMob(2, 80, 27, 35, 0);
+
    }
 
 
 	/* starts the graphics processing loop */
 	/* code after this will not run until the program exits */
    glutMainLoop();
-   return 0; 
+   return 0;
 }
-
