@@ -187,33 +187,36 @@ float *la;
       if (mob1z > 72) increasingmob1 = 0;
       if (mob1z < 52) increasingmob1 = 1;
 
-	/* rotate mob 1 around the y axis */
+	   /* rotate mob 1 around the y axis */
       mob1ry += 1.0;
       if (mob1ry > 360.0) mob1ry -= 360.0;
-    /* end testworld animation */
+     /* end testworld animation */
 
-   } else {
+     } else {
 
-      /* Assignment Update Code */
+     /* Assignment Update Code */
 
-	  /* camera positioning */
+     /* player info */
+     static float player_x = 7, player_y = 25, player_z = 7;
+     static float player_rot = 0;
+     setPlayerPosition(0, player_x, player_y, player_z, player_rot);
+
+  	 /* camera positioning */
 
 
-	  /* Mob 0 */
-      static float mob0_x = 25, mob0_y = 25, mob0_z = 25;
-      static float mob0_rot = -90;
-      static int incMob0 = 1;
+	   /* Mob 0 */
+     static float mob0_x = 25, mob0_y = 25, mob0_z = 25;
+     static float mob0_rot = -90;
 
-      setMobPosition(0, mob0_x, mob0_y, mob0_z, mob0_rot);
+     setMobPosition(0, mob0_x, mob0_y, mob0_z, mob0_rot);
 
-      /* Mob 1 */
-      static float mob1_x = 25, mob1_y = 27, mob1_z = 35;
-      static float mob1_rot = 0;
-      static int incMob1 = 1;
+     /* Mob 1 */
+     static float mob1_x = 25, mob1_y = 27, mob1_z = 35;
+     static float mob1_rot = 0;
 
-      setMobPosition(1, mob1_x, mob1_y, mob1_z, mob1_rot);
+     setMobPosition(1, mob1_x, mob1_y, mob1_z, mob1_rot);
 
-   }
+    }
 }
 
 
@@ -374,17 +377,24 @@ int i, j, k;
          }
       }
 
+      int wallChance;
+
       for (i = 0; i < 6; i++) {
          for (j = 0; j < 6; j++) {
-            drawWall(V_Walls[i][j]);
+            wallChance = rand() % 100 + 1;
+            if (wallChance <= 35) drawWall(V_Walls[i][j]);
          }
       }
 
       for (i = 0; i < 6; i++) {
          for (j = 0; j < 5; j++) {
-            drawWall(H_Walls[i][j]);
+            wallChance = rand() % 100 + 1;
+            if (wallChance <= 35) drawWall(H_Walls[i][j]);
          }
       }
+
+      setViewPosition(-7, -26, -7);
+      setViewOrientation(180, -150, 0);
 
       /* place player/entities */
       createPlayer(0, 7, 25, 7, 0);
