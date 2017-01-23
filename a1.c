@@ -123,7 +123,9 @@ void draw2D() {
       draw2Dbox(500, 380, 524, 388);
    } else {
 
-	/* your code goes here */
+	    /* your code goes here */
+      GLfloat green[] = {0.0, 0.5, 0.0, 0.5};
+      set2Dcolour(green);
 
    }
 
@@ -202,7 +204,7 @@ float *la;
      setPlayerPosition(0, player_x, player_y, player_z, player_rot);
 
   	 /* camera positioning */
-
+     getViewPosition(&player_x, &player_y, &player_z);
 
 	   /* Mob 0 */
      static float mob0_x = 25, mob0_y = 25, mob0_z = 25;
@@ -325,7 +327,7 @@ int i, j, k;
       /* build ground (same as -testworld) */
       for (i = 0; i < WORLDX; i++) {
          for (j = 0; j < WORLDZ; j++) {
-            world[i][24][j] = 3;
+            world[i][24][j] = 1;
          }
       }
 
@@ -343,7 +345,7 @@ int i, j, k;
          }
       }
 
-      /* build purple pillars */
+      /* build pillars */
       for (i = 1; i <= 6; i++) {
          for (j = 1; j < 6; j++) {
             for (k = 25; k < 30; k++) {
@@ -393,11 +395,9 @@ int i, j, k;
          }
       }
 
-      setViewPosition(-7, -26, -7);
-      setViewOrientation(180, -150, 0);
-
       /* place player/entities */
       createPlayer(0, 7, 25, 7, 0);
+      setViewPosition(-7, -27, -7);
       createMob(0, 25, 25, 25, -90);
       createMob(1, 25, 27, 35, 0);
       createMob(2, 80, 27, 35, 0);
