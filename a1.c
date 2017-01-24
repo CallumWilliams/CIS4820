@@ -99,9 +99,14 @@ extern void tree(float, float, float, float, float, float, int);
 	   will be the negative value of the array indices */
 void collisionResponse() {
 
+  static float oldX, oldY, oldZ;
+
+  getOldViewPosition(&oldX, &oldY, &oldZ);
   getViewPosition(&camera_x, &camera_y, &camera_z);
 
   if (world[(int)((camera_x)*-1)][(int)((camera_y)*-1)][(int)((camera_z)*-1)] != 0) {
+    setViewPosition(oldX, oldY, oldZ);
+    camera_x = oldX; camera_y = oldY; camera_z = oldZ;
     printf("collision\n");
   }
 
