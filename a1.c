@@ -21,6 +21,10 @@ typedef struct PULSAR_WALL {
 
 }Walls;
 
+  /* global variables for player position */
+static float camera_x = -7, camera_y = -25, camera_z = -7;
+static float player_rot = 0;
+
 	/* mouse function called by GLUT when a button is pressed or released */
 void mouse(int, int, int, int);
 
@@ -95,8 +99,13 @@ extern void tree(float, float, float, float, float, float, int);
 	   will be the negative value of the array indices */
 void collisionResponse() {
 
-	/* your collision code goes here */
+  getViewPosition(&camera_x, &camera_y, &camera_z);
 
+  if (world[(int)((camera_x)*-1)][(int)((camera_y)*-1)][(int)((camera_z)*-1)] != 0) {
+    printf("collision\n");
+  }
+
+  setPlayerPosition(0, ((camera_x)*-1)-0.5, (camera_y)*-1, ((camera_z)*-1)-0.5, player_rot);
 
 }
 
@@ -123,7 +132,7 @@ void draw2D() {
       draw2Dbox(500, 380, 524, 388);
    } else {
 
-	    /* your code goes here */
+	    /* HUD drawing */
       GLfloat green[] = {0.0, 0.5, 0.0, 0.5};
       set2Dcolour(green);
 
@@ -199,12 +208,7 @@ float *la;
      /* Assignment Update Code */
 
      /* player info */
-     static float player_x = 7, player_y = 25, player_z = 7;
-     static float player_rot = 0;
-     setPlayerPosition(0, player_x, player_y, player_z, player_rot);
-
-  	 /* camera positioning */
-     getViewPosition(&player_x, &player_y, &player_z);
+     setPlayerPosition(0, ((camera_x)*-1)-0.5, (camera_y)*-1, ((camera_z)*-1)-0.5, player_rot);
 
 	   /* Mob 0 */
      static float mob0_x = 25, mob0_y = 25, mob0_z = 25;
@@ -396,8 +400,9 @@ int i, j, k;
       }
 
       /* place player/entities */
-      createPlayer(0, 7, 25, 7, 0);
-      setViewPosition(-7, -27, -7);
+      createPlayer(0, camera_x, camera_y, camera_z, 0);
+      hidePlayer(0);
+      setViewPosition(-7, -25, -7);
       createMob(0, 25, 25, 25, -90);
       createMob(1, 25, 27, 35, 0);
       createMob(2, 80, 27, 35, 0);
