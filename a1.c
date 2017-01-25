@@ -107,11 +107,11 @@ void collisionResponse() {
   printf("(%lf, %lf, %lf) -> (%lf, %lf, %lf)\n", oldX, oldY, oldZ, camera_x, camera_y, camera_z);
 
   if (world[(int)((camera_x)*-1)][(int)((camera_y)*-1)][(int)((camera_z)*-1)] != 0) { //reset to old position
-    setViewPosition(oldX, oldY, oldZ);
     camera_x = oldX; camera_y = oldY; camera_z = oldZ;
     printf("collision\n");
   }
 
+  setViewPosition(camera_x, camera_y, camera_z);
   setPlayerPosition(0, ((camera_x)*-1)-0.5, (camera_y)*-1, ((camera_z)*-1)-0.5, player_rot);
 
 }
@@ -228,6 +228,13 @@ float *la;
      static float mob1_rot = 0;
 
      setMobPosition(1, mob1_x, mob1_y, mob1_z, mob1_rot);
+
+     /* gravity checks one square below (y) the current position*/
+     if (world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.5)][(int)((camera_z)*-1)] == 0) {
+       camera_y+=0.1;
+       setViewPosition(camera_x, camera_y, camera_z);
+       printf("fall\n");
+     }
 
     }
 }
