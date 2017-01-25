@@ -22,7 +22,7 @@ typedef struct PULSAR_WALL {
 }Walls;
 
   /* global variables for player position */
-static float camera_x = -7, camera_y = -25, camera_z = -7;
+static float camera_x = -7, camera_y = -30, camera_z = -7;
 static float player_rot = 0;
 
 	/* mouse function called by GLUT when a button is pressed or released */
@@ -104,7 +104,9 @@ void collisionResponse() {
   getOldViewPosition(&oldX, &oldY, &oldZ);
   getViewPosition(&camera_x, &camera_y, &camera_z);
 
-  if (world[(int)((camera_x)*-1)][(int)((camera_y)*-1)][(int)((camera_z)*-1)] != 0) {
+  printf("(%lf, %lf, %lf) -> (%lf, %lf, %lf)\n", oldX, oldY, oldZ, camera_x, camera_y, camera_z);
+
+  if (world[(int)((camera_x)*-1)][(int)((camera_y)*-1)][(int)((camera_z)*-1)] != 0) { //reset to old position
     setViewPosition(oldX, oldY, oldZ);
     camera_x = oldX; camera_y = oldY; camera_z = oldZ;
     printf("collision\n");
@@ -407,7 +409,7 @@ int i, j, k;
       /* place player/entities */
       createPlayer(0, camera_x, camera_y, camera_z, 0);
       hidePlayer(0);
-      setViewPosition(-7, -25, -7);
+      setViewPosition(camera_x, camera_y, camera_z);
       createMob(0, 25, 25, 25, -90);
       createMob(1, 25, 27, 35, 0);
       createMob(2, 80, 27, 35, 0);
