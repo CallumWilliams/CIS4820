@@ -327,7 +327,6 @@ float *la;
          }
 
        }
-       printf("at %d\n", wallCount);
        wallChangeTimer = 0;
      } else wallChangeTimer++;
 
@@ -452,6 +451,10 @@ int i, j, k;
             V_Walls[i][j].ENDZ = (j*15) + 15;
             V_Walls[i][j].orientation = 1;
             V_Walls[i][j].enabled = 0;
+            if (i == 5)
+              V_Walls[i][j].ENDZ -= 1;
+            if (j == 5)
+              V_Walls[i][j].ENDZ -= 1;
          }
       }
 
@@ -464,6 +467,10 @@ int i, j, k;
             H_Walls[i][j].ENDZ = H_Walls[i][j].STARTZ;
             H_Walls[i][j].orientation = 0;
             H_Walls[i][j].enabled = 0;
+            if (i == 5)
+              H_Walls[i][j].ENDX -= 1;
+            if (j == 5)
+              H_Walls[i][j].ENDX -= 1;
          }
       }
 
