@@ -18,12 +18,23 @@ typedef struct PULSAR_WALL {
    int STARTX, STARTZ;
    int ENDX, ENDZ;
    int orientation; //0 = horizontal, 1 = vertical
+   int enabled; //0 = false, 1 = true
 
 }Walls;
 
   /* global variables for player position */
 static float camera_x = -7, camera_y = -30, camera_z = -7;
 static float player_rot = 0;
+
+  /* global variable for wall locations */
+Walls V_Walls[10][10];
+Walls H_Walls[10][10];
+
+  /* global variables for dynamic walls */
+int wallChangeTimer = 0; //global timer
+int wallI, wallJ, wallType; //random generators
+int wallCount = 0; //on generation, there are 20 walls
+Walls changedWall; //stores data for wall to be changed
 
 	/* mouse function called by GLUT when a button is pressed or released */
 void mouse(int, int, int, int);
@@ -104,11 +115,8 @@ void collisionResponse() {
   getOldViewPosition(&oldX, &oldY, &oldZ);
   getViewPosition(&camera_x, &camera_y, &camera_z);
 
-  printf("(%lf, %lf, %lf) -> (%lf, %lf, %lf)\n", oldX, oldY, oldZ, camera_x, camera_y, camera_z);
-
   if (world[(int)((camera_x)*-1)][(int)((camera_y)*-1)][(int)((camera_z)*-1)] != 0) { //reset to old position
     camera_x = oldX; camera_y = oldY; camera_z = oldZ;
-    printf("collision\n");
   }
 
   setViewPosition(camera_x, camera_y, camera_z);
@@ -147,6 +155,53 @@ void draw2D() {
 
 }
 
+void drawWall(Walls w) {
+
+  int i, j;
+
+  if (w.orientation == 0) {//horizontal
+
+     for (i = w.STARTX+1; i < w.ENDX; i++) {
+        for (j = 25; j < 30; j++) {
+          world[i][j][w.STARTZ] = 2;
+        }
+     }
+
+  } else {//vertical
+
+     for (i = w.STARTZ+1; i < w.ENDZ; i++) {
+        for (j = 25; j < 30; j++) {
+          world[w.STARTX][j][i] = 2;
+        }
+     }
+
+  }
+
+}
+
+void removeWall(Walls w) {
+
+   int i, j;
+
+   if (w.orientation == 0) {//horizontal
+
+      for (i = w.STARTX+1; i < w.ENDX; i++) {
+         for (j = 25; j < 30; j++) {
+            world[i][j][w.STARTZ] = 0;
+         }
+      }
+
+   } else {//vertical
+
+      for (i = w.STARTZ+1; i < w.ENDZ; i++) {
+         for (j = 25; j < 30; j++) {
+            world[w.STARTX][j][i] = 0;
+         }
+      }
+
+   }
+
+}
 
 	/*** update() ***/
 	/* background process, it is called when there are no other events */
@@ -230,11 +285,51 @@ float *la;
      setMobPosition(1, mob1_x, mob1_y, mob1_z, mob1_rot);
 
      /* gravity checks one square below (y) the current position*/
-     if (world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.5)][(int)((camera_z)*-1)] == 0) {
-       camera_y+=0.1;
-       setViewPosition(camera_x, camera_y, camera_z);
-       printf("fall\n");
+     if (world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) {
+       //camera_y+=0.1;
+       //setViewPosition(camera_x, camera_y, camera_z);
      }
+
+     if (wallChangeTimer == 150) {
+
+       srand(time(NULL));
+       wallI = rand() % 6 + 1;
+       wallJ = rand() % 6 + 1;
+       wallType = rand() % 2 + 1;
+
+       //select wall type
+       if (wallType == 0) { //swap horizontal wall
+         //toggle wall
+         if (H_Walls[wallI][wallJ].enabled) {
+           removeWall(H_Walls[wallI][wallJ]);
+           H_Walls[wallI][wallJ].enabled = 0;
+           wallCount--;
+         } else {
+           if (!(wallCount >= 25)) { //making sure to not exceed wall limit
+             drawWall(H_Walls[wallI][wallJ]);
+             H_Walls[wallI][wallJ].enabled = 1;
+             wallCount++;
+           }
+         }
+
+       } else { //swap vertical wall
+         //toggle wall
+         if (V_Walls[wallI][wallJ].enabled) {
+           removeWall(H_Walls[wallI][wallJ]);
+           V_Walls[wallI][wallJ].enabled = 0;
+           wallCount--;
+         } else {
+           if (!(wallCount >= 25)) { //making sure to not exceed wall limit
+             drawWall(V_Walls[wallI][wallJ]);
+             V_Walls[wallI][wallJ].enabled = 1;
+             wallCount++;
+           }
+         }
+
+       }
+       printf("at %d\n", wallCount);
+       wallChangeTimer = 0;
+     } else wallChangeTimer++;
 
     }
 }
@@ -260,30 +355,6 @@ void mouse(int button, int state, int x, int y) {
       printf("down - ");
 
    printf("%d %d\n", x, y);
-}
-
-void drawWall(Walls w) {
-
-   int i, j;
-
-   if (w.orientation == 0) {//horizontal
-
-      for (i = w.STARTX+1; i < w.ENDX; i++) {
-         for (j = 25; j < 30; j++) {
-            world[i][j][w.STARTZ] = 2;
-         }
-      }
-
-   } else {//vertical
-
-      for (i = w.STARTZ+1; i < w.ENDZ; i++) {
-         for (j = 25; j < 30; j++) {
-            world[w.STARTX][j][i] = 2;
-         }
-      }
-
-   }
-
 }
 
 int main(int argc, char** argv)
@@ -320,7 +391,7 @@ int i, j, k;
       world[52][25][52] = 2;
       world[52][26][52] = 2;
 
-	/* blue box shows xy bounds of the world */
+	/* blue box shows xz bounds of the world */
       for(i=0; i<WORLDX-1; i++) {
          world[i][25][0] = 2;
          world[i][25][WORLDZ-1] = 2;
@@ -372,9 +443,6 @@ int i, j, k;
          }
       }
 
-      Walls V_Walls[6][6];
-      Walls H_Walls[6][6];
-
       /* set vertical wall positions */
       for (i = 0; i < 6; i++) {
          for (j = 0; j < 6; j++) {
@@ -383,6 +451,7 @@ int i, j, k;
             V_Walls[i][j].ENDX = V_Walls[i][j].STARTX;
             V_Walls[i][j].ENDZ = (j*15) + 15;
             V_Walls[i][j].orientation = 1;
+            V_Walls[i][j].enabled = 0;
          }
       }
 
@@ -394,22 +463,32 @@ int i, j, k;
             H_Walls[i][j].ENDX = (i*15) + 15;
             H_Walls[i][j].ENDZ = H_Walls[i][j].STARTZ;
             H_Walls[i][j].orientation = 0;
+            H_Walls[i][j].enabled = 0;
          }
       }
 
       int wallChance;
+      srand(time(NULL));
 
       for (i = 0; i < 6; i++) {
          for (j = 0; j < 6; j++) {
             wallChance = rand() % 100 + 1;
-            if (wallChance <= 35) drawWall(V_Walls[i][j]);
+            if (wallChance <= 30 && wallCount < 20) {
+              drawWall(V_Walls[i][j]);
+              V_Walls[i][j].enabled = 1;
+              wallCount++;
+            }
          }
       }
 
       for (i = 0; i < 6; i++) {
-         for (j = 0; j < 5; j++) {
+         for (j = 0; j < 6; j++) {
             wallChance = rand() % 100 + 1;
-            if (wallChance <= 35) drawWall(H_Walls[i][j]);
+            if (wallChance <= 30 && wallCount < 20) {
+              drawWall(H_Walls[i][j]);
+              H_Walls[i][j].enabled = 1;
+              wallCount++;
+            }
          }
       }
 
