@@ -27,14 +27,14 @@ static float camera_x = -7, camera_y = -30, camera_z = -7;
 static float player_rot = 0;
 
   /* global variable for wall locations */
-Walls V_Walls[10][10];
-Walls H_Walls[10][10];
+Walls V_Walls[6][6];
+Walls H_Walls[6][6];
 
-  /* global variables for dynamic walls */
-int wallChangeTimer = 0; //global timer
-int wallI, wallJ, wallType; //random generators
-int wallCount = 0; //on generation, there are 20 walls
-Walls changedWall; //stores data for wall to be changed
+  /* wall animation variables */
+Walls changedWall;
+int wallX, wallZ; //position of animated wall
+int wallType; //type; 0 = horizontal, 1 = vertical
+int wallToggle = 0; //toggle variable; 0 = add wall, 1 = remove wall
 
 	/* mouse function called by GLUT when a button is pressed or released */
 void mouse(int, int, int, int);
@@ -209,11 +209,71 @@ void removeWall(Walls w) {
 
 }
 
+void animateWall(int n) {
+
+  int i;
+  int animX, animZ;
+
+  if (!(n == 15)) {
+
+    printf("%d\n", n);
+    if (wallType == 0) {
+      animX = H_Walls[wallX][wallZ].STARTX + n;
+      animZ = H_Walls[wallX][wallZ].STARTZ;
+    } else {
+      animX = V_Walls[wallX][wallZ].STARTX;
+      animZ = V_Walls[wallX][wallZ].STARTZ + n;
+    }
+
+    if (world[animX][25][animZ] != 6) { //if it's not a pillar
+
+      for (i = 25; i < 30; i++) {
+
+        if (wallToggle == 0 && world[animX][i][animZ] == 0) {
+          world[animX][i][animZ] = 5;
+        } else if (wallToggle == 1 && world[animX][i][animZ] == 5){
+          world[animX][i][animZ] = 0;
+        }
+
+      }
+
+    }
+
+    glutTimerFunc(200, animateWall, n+1);
+
+  }
+
+}
+
 void selectWall() {
 
+  srand(time(NULL));
 
+  do {
 
-  glutTimerFunc(5000, selectWall, 5);
+    wallX = rand() % 6 + 1;
+    wallZ = rand() % 6 + 1;
+    wallType = rand() % 2 + 1;
+
+    if (wallType == 0) changedWall = H_Walls[wallX][wallZ];
+    else changedWall = V_Walls[wallX][wallZ];
+
+  } while (changedWall.enabled != wallToggle);
+
+  printf("Using wall (%d, %d) to (%d, %d)\n", changedWall.STARTX, changedWall.STARTX, changedWall.ENDX, changedWall.ENDZ);
+  glutTimerFunc(200, animateWall, 0);
+
+  if (wallToggle == 1) {
+    if (wallType == 0) H_Walls[wallX][wallZ].enabled = 0;
+    else V_Walls[wallX][wallZ].enabled = 0;
+    wallToggle = 0;
+  } else {
+    if (wallType == 0) H_Walls[wallX][wallZ].enabled = 1;
+    else V_Walls[wallX][wallZ].enabled = 1;
+    wallToggle = 1;
+  }
+
+  glutTimerFunc(7500, selectWall, 5);
 }
 
 	/*** update() ***/
@@ -299,8 +359,8 @@ float *la;
 
      /* gravity checks one square below (y) the current position*/
      if (world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) {
-       camera_y+=0.1;
-       setViewPosition(camera_x, camera_y, camera_z);
+       //camera_y+=0.1;
+       //setViewPosition(camera_x, camera_y, camera_z);
      }
 
     }
@@ -446,7 +506,7 @@ int i, j, k;
          }
       }
 
-      int wallChance;
+      int wallChance; int wallCount = 0;
       srand(time(NULL));
 
       for (i = 0; i < 5; i++) {
