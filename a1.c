@@ -116,7 +116,13 @@ void collisionResponse() {
   getViewPosition(&camera_x, &camera_y, &camera_z);
 
   if (world[(int)((camera_x)*-1)][(int)((camera_y)*-1)][(int)((camera_z)*-1)] != 0) { //reset to old position
-    camera_x = oldX; camera_y = oldY; camera_z = oldZ;
+
+    if (world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)+1)][(int)((camera_z)*-1)] == 0) {
+      camera_x = oldX; camera_y -= 1; camera_z = oldZ; //really ugly right now, but works
+    } else {
+      camera_x = oldX; camera_y = oldY; camera_z = oldZ;
+    }
+
   }
 
   setViewPosition(camera_x, camera_y, camera_z);
@@ -203,9 +209,11 @@ void removeWall(Walls w) {
 
 }
 
-void printStuff() {
-  printf("test\n");
-  glutTimerFunc(100, printStuff, 5);
+void selectWall() {
+
+
+
+  glutTimerFunc(5000, selectWall, 5);
 }
 
 	/*** update() ***/
@@ -291,8 +299,8 @@ float *la;
 
      /* gravity checks one square below (y) the current position*/
      if (world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) {
-       //camera_y+=0.1;
-       //setViewPosition(camera_x, camera_y, camera_z);
+       camera_y+=0.1;
+       setViewPosition(camera_x, camera_y, camera_z);
      }
 
     }
@@ -463,6 +471,11 @@ int i, j, k;
          }
       }
 
+      /* place climbing test */
+      world[10][25][5] = 4;
+      world[11][25][5] = 4;
+      world[11][26][5] = 4;
+
       /* place player/entities */
       setViewPosition(camera_x, camera_y, camera_z);
       createMob(0, 25, 25, 25, -90);
@@ -472,7 +485,7 @@ int i, j, k;
    }
 
    /* initialize animation timer */
-   glutTimerFunc(100, printStuff, 5);
+   glutTimerFunc(100, selectWall, 5);
 	/* starts the graphics processing loop */
 	/* code after this will not run until the program exits */
    glutMainLoop();
