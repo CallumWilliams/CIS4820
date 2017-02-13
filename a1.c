@@ -163,7 +163,7 @@ void drawWall(Walls w) {
 
      for (i = w.STARTX+1; i < w.ENDX; i++) {
         for (j = 25; j < 30; j++) {
-          world[i][j][w.STARTZ] = 2;
+          world[i][j][w.STARTZ] = 5;
         }
      }
 
@@ -171,7 +171,7 @@ void drawWall(Walls w) {
 
      for (i = w.STARTZ+1; i < w.ENDZ; i++) {
         for (j = 25; j < 30; j++) {
-          world[w.STARTX][j][i] = 2;
+          world[w.STARTX][j][i] = 5;
         }
      }
 
@@ -201,6 +201,11 @@ void removeWall(Walls w) {
 
    }
 
+}
+
+void printStuff() {
+  printf("test\n");
+  glutTimerFunc(100, printStuff, 5);
 }
 
 	/*** update() ***/
@@ -290,49 +295,8 @@ float *la;
        //setViewPosition(camera_x, camera_y, camera_z);
      }
 
-     if (wallChangeTimer == 150) {
-
-       srand(time(NULL));
-       wallI = rand() % 6 + 1;
-       wallJ = rand() % 6 + 1;
-       wallType = rand() % 2 + 1;
-
-       //select wall type
-       if (wallType == 0) { //swap horizontal wall
-         //toggle wall
-         if (H_Walls[wallI][wallJ].enabled) {
-           removeWall(H_Walls[wallI][wallJ]);
-           H_Walls[wallI][wallJ].enabled = 0;
-           wallCount--;
-         } else {
-           if (!(wallCount >= 25)) { //making sure to not exceed wall limit
-             drawWall(H_Walls[wallI][wallJ]);
-             H_Walls[wallI][wallJ].enabled = 1;
-             wallCount++;
-           }
-         }
-
-       } else { //swap vertical wall
-         //toggle wall
-         if (V_Walls[wallI][wallJ].enabled) {
-           removeWall(H_Walls[wallI][wallJ]);
-           V_Walls[wallI][wallJ].enabled = 0;
-           wallCount--;
-         } else {
-           if (!(wallCount >= 25)) { //making sure to not exceed wall limit
-             drawWall(V_Walls[wallI][wallJ]);
-             V_Walls[wallI][wallJ].enabled = 1;
-             wallCount++;
-           }
-         }
-
-       }
-       wallChangeTimer = 0;
-     } else wallChangeTimer++;
-
     }
 }
-
 
 	/* called by GLUT when a mouse button is pressed or released */
 	/* -button indicates which button was pressed or released */
@@ -413,28 +377,28 @@ int i, j, k;
       /* Assignment Code */
 
       /* build ground (same as -testworld) */
-      for (i = 0; i < WORLDX; i++) {
-         for (j = 0; j < WORLDZ; j++) {
+      for (i = 0; i < 90; i++) {
+         for (j = 0; j < 90; j++) {
             world[i][24][j] = 1;
          }
       }
 
       /* boundary box */
-      for (i = 0; i < WORLDX-1; i++) {
+      for (i = 0; i < 90-1; i++) {
          for (j = 25; j < 30; j++) {
             world[i][j][0] = 2;
-            world[i][j][WORLDZ-1] = 2;
+            world[i][j][89] = 2;
          }
       }
-      for (i = 0; i < WORLDZ; i++) {
+      for (i = 0; i < 90; i++) {
          for (j = 25; j < 30; j++) {
             world[0][j][i] = 2;
-            world[WORLDX-1][j][i] = 2;
+            world[89][j][i] = 2;
          }
       }
 
       /* build pillars */
-      for (i = 1; i <= 6; i++) {
+      for (i = 1; i < 6; i++) {
          for (j = 1; j < 6; j++) {
             for (k = 25; k < 30; k++) {
                world[i*15][k][j*15] = 6;
@@ -477,7 +441,7 @@ int i, j, k;
       int wallChance;
       srand(time(NULL));
 
-      for (i = 0; i < 6; i++) {
+      for (i = 0; i < 5; i++) {
          for (j = 0; j < 6; j++) {
             wallChance = rand() % 100 + 1;
             if (wallChance <= 30 && wallCount < 20) {
@@ -500,8 +464,6 @@ int i, j, k;
       }
 
       /* place player/entities */
-      createPlayer(0, camera_x, camera_y, camera_z, 0);
-      hidePlayer(0);
       setViewPosition(camera_x, camera_y, camera_z);
       createMob(0, 25, 25, 25, -90);
       createMob(1, 25, 27, 35, 0);
@@ -509,7 +471,8 @@ int i, j, k;
 
    }
 
-
+   /* initialize animation timer */
+   glutTimerFunc(100, printStuff, 5);
 	/* starts the graphics processing loop */
 	/* code after this will not run until the program exits */
    glutMainLoop();
