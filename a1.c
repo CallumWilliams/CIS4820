@@ -116,19 +116,11 @@ void collisionResponse() {
   getViewPosition(&camera_x, &camera_y, &camera_z);
 
   //collision detection
-  if (world[(int)((camera_x)*-1)][(int)((camera_y)*-1)][(int)((camera_z)*-1)] != 0) {
-
-    //climb
-    if (world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)+1)][(int)((camera_z)*-1)] == 0) {
-      camera_x = oldX; camera_y -= 0.3; camera_z = oldZ; //really ugly right now, but works
-    //regular collision
-    } else {
-      camera_x = oldX; camera_y = oldY; camera_z = oldZ;
-    }
-  //out of bounds
-} else if (((camera_x)*-1 > WORLDX) || ((camera_x)*-1 < 0) || ((camera_y)*-1 > WORLDY) || ((camera_y)*-1 < 0) || ((camera_z)*-1 > WORLDZ) || ((camera_z)*-1 < 0)) {
+  if (world[(int)(((camera_x)*-1)+0.1)][(int)(((camera_y)*-1)+0.1)][(int)(((camera_z)*-1)+0.1)] != 0) {
     camera_x = oldX; camera_y = oldY; camera_z = oldZ;
-    printf("test\n");
+  //out of bounds
+  } else if (((camera_x)*-1 > WORLDX) || ((camera_x)*-1 < 0) || ((camera_y)*-1 > WORLDY) || ((camera_y)*-1 < 0) || ((camera_z)*-1 > WORLDZ) || ((camera_z)*-1 < 0)) {
+    camera_x = oldX; camera_y = oldY; camera_z = oldZ;
   }
 
   setViewPosition(camera_x, camera_y, camera_z);
@@ -362,9 +354,9 @@ float *la;
      setMobPosition(1, mob1_x, mob1_y, mob1_z, mob1_rot);
 
      /* gravity checks one square below (y) the current position*/
-     if (world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) {
-       //camera_y+=0.1;
-       //setViewPosition(camera_x, camera_y, camera_z);
+     if ((world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) && flycontrol) {
+       camera_y+=0.1;
+       setViewPosition(camera_x, camera_y, camera_z);
      }
 
     }
@@ -377,19 +369,10 @@ float *la;
 	/*  released */
 void mouse(int button, int state, int x, int y) {
 
-   if (button == GLUT_LEFT_BUTTON)
-      printf("left button - ");
-   else if (button == GLUT_MIDDLE_BUTTON)
-      printf("middle button - ");
-   else
-      printf("right button - ");
-
-   if (state == GLUT_UP)
-      printf("up - ");
-   else
-      printf("down - ");
-
-   printf("%d %d\n", x, y);
+   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+     printf("pew\n");
+   }
+   
 }
 
 int main(int argc, char** argv)
@@ -452,6 +435,7 @@ int i, j, k;
       for (i = 0; i < 90; i++) {
          for (j = 0; j < 90; j++) {
             world[i][24][j] = 1;
+            world[i][30][j] = 1;
          }
       }
 
