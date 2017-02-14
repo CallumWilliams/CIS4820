@@ -27,8 +27,8 @@ static float camera_x = -7, camera_y = -30, camera_z = -7;
 static float player_rot = 0;
 
   /* global variable for wall locations */
-Walls V_Walls[6][6];
-Walls H_Walls[6][6];
+Walls V_Walls[5][6];
+Walls H_Walls[6][5];
 
   /* wall animation variables */
 Walls changedWall;
@@ -115,14 +115,20 @@ void collisionResponse() {
   getOldViewPosition(&oldX, &oldY, &oldZ);
   getViewPosition(&camera_x, &camera_y, &camera_z);
 
-  if (world[(int)((camera_x)*-1)][(int)((camera_y)*-1)][(int)((camera_z)*-1)] != 0) { //reset to old position
+  //collision detection
+  if (world[(int)((camera_x)*-1)][(int)((camera_y)*-1)][(int)((camera_z)*-1)] != 0) {
 
+    //climb
     if (world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)+1)][(int)((camera_z)*-1)] == 0) {
-      camera_x = oldX; camera_y -= 1; camera_z = oldZ; //really ugly right now, but works
+      camera_x = oldX; camera_y -= 0.3; camera_z = oldZ; //really ugly right now, but works
+    //regular collision
     } else {
       camera_x = oldX; camera_y = oldY; camera_z = oldZ;
     }
-
+  //out of bounds
+} else if (((camera_x)*-1 > WORLDX) || ((camera_x)*-1 < 0) || ((camera_y)*-1 > WORLDY) || ((camera_y)*-1 < 0) || ((camera_z)*-1 > WORLDZ) || ((camera_z)*-1 < 0)) {
+    camera_x = oldX; camera_y = oldY; camera_z = oldZ;
+    printf("test\n");
   }
 
   setViewPosition(camera_x, camera_y, camera_z);
@@ -216,7 +222,6 @@ void animateWall(int n) {
 
   if (!(n == 15)) {
 
-    printf("%d\n", n);
     if (wallType == 0) {
       animX = H_Walls[wallX][wallZ].STARTX + n;
       animZ = H_Walls[wallX][wallZ].STARTZ;
@@ -260,7 +265,6 @@ void selectWall() {
 
   } while (changedWall.enabled != wallToggle);
 
-  printf("Using wall (%d, %d) to (%d, %d)\n", changedWall.STARTX, changedWall.STARTX, changedWall.ENDX, changedWall.ENDZ);
   glutTimerFunc(200, animateWall, 0);
 
   if (wallToggle == 1) {
@@ -475,7 +479,7 @@ int i, j, k;
       }
 
       /* set vertical wall positions */
-      for (i = 0; i < 6; i++) {
+      for (i = 0; i < 5; i++) {
          for (j = 0; j < 6; j++) {
             V_Walls[i][j].STARTX = (i*15) + 15;
             V_Walls[i][j].STARTZ = j*15;
