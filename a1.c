@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 #include "graphics.h"
 
@@ -35,6 +36,9 @@ Walls changedWall;
 int wallX, wallZ; //position of animated wall
 int wallType; //type; 0 = horizontal, 1 = vertical
 int wallToggle = 0; //toggle variable; 0 = add wall, 1 = remove wall
+
+static time_t gameStart; //gets start time of game code
+int projState = 0; //0 = not on board, 1 = generate, 2 = moving
 
 	/* mouse function called by GLUT when a button is pressed or released */
 void mouse(int, int, int, int);
@@ -114,14 +118,22 @@ void collisionResponse() {
 
   getOldViewPosition(&oldX, &oldY, &oldZ);
   getViewPosition(&camera_x, &camera_y, &camera_z);
+  printf("%lf %lf %lf to %lf %lf %lf\n", oldX, oldY, oldZ, camera_x, camera_y, camera_z);
 
   //collision detection
-  if (world[(int)(((camera_x)*-1)+0.1)][(int)(((camera_y)*-1)+0.1)][(int)(((camera_z)*-1)+0.1)] != 0) {
-    camera_x = oldX; camera_y = oldY; camera_z = oldZ;
+  if (world[(int)(((camera_x)*-1))][(int)(((camera_y)*-1))][(int)(((camera_z)*-1))] != 0) {
+    //climbing detection - checks the spot directly above current collided block
+    if (world[(int)(((camera_x)*-1))][(int)(((camera_y)*-1)+1)][(int)(((camera_z)*-1))] == 0) {
+      printf("init\n");
+      camera_y -= 1;
+    } else {
+      camera_x = oldX; camera_y = oldY; camera_z = oldZ;
+    }
+
   //out of bounds
   } else if (((camera_x)*-1 > WORLDX) || ((camera_x)*-1 < 0) || ((camera_y)*-1 > WORLDY) || ((camera_y)*-1 < 0) || ((camera_z)*-1 > WORLDZ) || ((camera_z)*-1 < 0)) {
     camera_x = oldX; camera_y = oldY; camera_z = oldZ;
-  }
+}
 
   setViewPosition(camera_x, camera_y, camera_z);
   setPlayerPosition(0, ((camera_x)*-1)-0.5, (camera_y)*-1, ((camera_z)*-1)-0.5, player_rot);
@@ -354,9 +366,17 @@ float *la;
      setMobPosition(1, mob1_x, mob1_y, mob1_z, mob1_rot);
 
      /* gravity checks one square below (y) the current position*/
-     if ((world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) && flycontrol) {
+     if ((world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) && !flycontrol) {
        camera_y+=0.1;
        setViewPosition(camera_x, camera_y, camera_z);
+     }
+
+     /* shooting */
+     if (projState == 1) {
+       setMobPosition(9, camera_x*-1, camera_y*-1, camera_z*-1, 0);
+       projState = 2;
+     } else if (projState == 2) {
+
      }
 
     }
@@ -369,10 +389,13 @@ float *la;
 	/*  released */
 void mouse(int button, int state, int x, int y) {
 
-   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && projState == 0) {
      printf("pew\n");
+     projState = 1;
+     createMob(9, camera_x*-1, camera_y*-1, camera_z*-1, 0);
+
    }
-   
+
 }
 
 int main(int argc, char** argv)
@@ -435,7 +458,6 @@ int i, j, k;
       for (i = 0; i < 90; i++) {
          for (j = 0; j < 90; j++) {
             world[i][24][j] = 1;
-            world[i][30][j] = 1;
          }
       }
 
