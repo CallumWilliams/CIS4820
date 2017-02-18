@@ -1,5 +1,3 @@
-
-
 INCLUDES = -w -F/System/Library/Frameworks -framework OpenGL -framework GLUT -lm
 
 a1: a1.c wall graphic visible

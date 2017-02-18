@@ -129,16 +129,13 @@ void animateWall(int n) {
       animX = V_Walls[wallVar2][wallVar1].STARTX;
       animZ = V_Walls[wallVar2][wallVar1].STARTZ + n;
     }
-    if (wallToggle == 0)
-      printf("adding %d %d\n", animX, animZ);
-    else
-      printf("removing %d %d\n", animX, animZ);
 
     for (i = 25; i < 30; i++) {
 
-      if (wallToggle == 0) {
+      if (wallToggle == 0 && world[animX][i][animZ] == 0) {
         world[animX][i][animZ] = 5;
-      } else {
+
+      } else if (wallToggle == 1 && world[animX][i][animZ] == 5){
         world[animX][i][animZ] = 0;
       }
 
@@ -166,11 +163,6 @@ void selectWall() {
 
   } while (changedWall.enabled != wallToggle);
 
-  if (wallType == 0) {
-    printf("changing hwall position from %d %d to %d %d\n", changedWall.STARTX, changedWall.STARTZ, changedWall.ENDX, changedWall.ENDZ);
-  } else {
-    printf("changing vwall position from %d %d to %d %d\n", changedWall.STARTX, changedWall.STARTZ, changedWall.ENDX, changedWall.ENDZ);
-  }
   glutTimerFunc(200, animateWall, 0);
 
   if (wallToggle == 1) {

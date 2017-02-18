@@ -146,9 +146,77 @@ void draw2D() {
       draw2Dbox(500, 380, 524, 388);
    } else {
 
-	    /* HUD drawing */
-      GLfloat green[] = {0.0, 0.5, 0.0, 0.5};
-      set2Dcolour(green);
+     int i, j;
+
+     GLfloat green[]  = {0.0, 0.5, 0.0, 0.75};
+     GLfloat blue[]   = {0.0, 0.0, 0.5, 0.75};
+     GLfloat red[]    = {0.5, 0.0, 0.0, 0.75};
+     GLfloat yellow[] = {0.5, 0.5, 0.0, 0.75};
+     GLfloat black[]  = {0.0, 0.0, 0.0, 0.75};
+     GLfloat white[]  = {1.0, 1.0, 1.0, 0.75};
+
+     if (displayMap == 1) { //top-right corner
+
+       set2Dcolour(yellow);
+       getViewPosition(&camera_x, &camera_y, &camera_z);
+
+
+       for (i = 0; i <= 90; i++) {
+
+         for (j = 0; j <= 90; j++) {
+
+           switch(world[j][25][i]) {
+             case 0: //nothing (ground) case
+              set2Dcolour(green);
+              break;
+            case 5: //wall cases
+              set2Dcolour(blue);
+              break;
+            case 6: //boundary + pillar cases
+              set2Dcolour(white);
+              break;
+            default:
+              set2Dcolour(black);
+           }
+           draw2Dbox(screenWidth-190+(i*2), screenHeight-190+(j*2), screenWidth-190+(i*2)+5, screenHeight-190+(j*2)+5);
+         }
+
+       }
+
+     } else if (displayMap == 2) { //primary display
+
+       for (i = 0; i <= 90; i++) {
+
+         for (j = 0; j <= 90; j++) {
+
+           switch(world[j][25][i]) {
+             case 0: //nothing (ground) case
+              set2Dcolour(green);
+              break;
+            case 5: //wall cases
+              set2Dcolour(blue);
+              break;
+            case 6: //boundary + pillar cases
+              set2Dcolour(white);
+              break;
+            default:
+              set2Dcolour(black);
+           }
+           draw2Dbox((screenWidth/4)+(i*4), (screenHeight/4)+(j*4), (screenWidth/4)+(i*4)+20, (screenHeight/4)+(j*4)+20);
+         }
+
+       }
+
+     } else { //no display
+
+     }
+
+
+
+      /* draw player */
+      /* draw pillars */
+      /* draw walls */
+      /* draw background */
 
    }
 
