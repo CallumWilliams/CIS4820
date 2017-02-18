@@ -10,12 +10,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <time.h>
 
 #include "graphics.h"
 #include "walls.h"
 
 #define M_PI 3.14159265358979323846
+#define MILLISECONDS_PER_UPDATE 17 //17*60 = 1020 (or 60 frames/1.02 seconds)
 
   /* global variables for player position */
 static float camera_x = -7, camera_y = -30, camera_z = -7;
@@ -24,8 +24,7 @@ static float view_x, view_y, view_z;
   /* global variable for wall locations */
 extern Walls V_Walls[5][6];
 extern Walls H_Walls[6][5];
-
-static time_t gameStart; //gets start time of game code
+static int n; //wall animation timer
 
 /* projectile global variables */
 static int projState = 0; //0 = not on board, 1 = generate, 2 = moving
@@ -166,7 +165,10 @@ void draw2D() {
 
        set2Dcolour(yellow);
        getViewPosition(&camera_x, &camera_y, &camera_z);
-
+       draw2Dbox(screenWidth-190+((int)camera_z*-2),
+                 screenHeight-190+((int)camera_x*-2),
+                 screenWidth-190+((int)camera_z*-2)+5,
+                 screenHeight-190+((int)camera_x*-2)+5);
 
        for (i = 0; i < 90; i++) {
 
@@ -185,13 +187,23 @@ void draw2D() {
             default:
               set2Dcolour(black);
            }
-           draw2Dbox(screenWidth-190+(i*2), screenHeight-190+(j*2), screenWidth-190+(i*2)+5, screenHeight-190+(j*2)+5);
+           draw2Dbox(screenWidth-190+(i*2),
+                     screenHeight-190+(j*2),
+                     screenWidth-190+(i*2)+5,
+                     screenHeight-190+(j*2)+5);
          }
 
        }
 
      } else if (displayMap == 2) { //primary display
 
+       set2Dcolour(yellow);
+       getViewPosition(&camera_x, &camera_y, &camera_z);
+       draw2Dbox((screenWidth/4)+((int)camera_z*-4),
+                 (screenHeight/4)+((int)camera_x*-4),
+                 (screenWidth/4)+((int)camera_z*-4),
+                 (screenHeight/4)+((int)camera_x*-4));
+
        for (i = 0; i < 90; i++) {
 
          for (j = 0; j < 90; j++) {
@@ -209,7 +221,10 @@ void draw2D() {
             default:
               set2Dcolour(black);
            }
-           draw2Dbox((screenWidth/4)+(i*4), (screenHeight/4)+(j*4), (screenWidth/4)+(i*4)+20, (screenHeight/4)+(j*4)+20);
+           draw2Dbox((screenWidth/4)+(i*4),
+                     (screenHeight/4)+(j*4),
+                     (screenWidth/4)+(i*4)+20,
+                     (screenHeight/4)+(j*4)+20);
          }
 
        }
@@ -222,8 +237,10 @@ void draw2D() {
 
 void timedAnimation() {
 
-  selectWall();
-  glutTimerFunc(5000, timedAnimation, 0);
+  if (n == 0) selectWall();
+  if (n == 160) n = 0;
+  else if (n >= 0 && n < 15)animateWall(n);
+  n++;
 
 }
 
@@ -292,50 +309,50 @@ float *la;
      } else {
 
      /* Assignment Update Code */
+     int gameElapsed = glutGet(GLUT_ELAPSED_TIME);
+     //update can occur - execute
+     if ((float)(gameElapsed/MILLISECONDS_PER_UPDATE) == (int)(gameElapsed/MILLISECONDS_PER_UPDATE)) {
+       timedAnimation();
+  	   /* Mob 0 */
+       static float mob0_x = 25, mob0_y = 25, mob0_z = 25;
+       static float mob0_rot = -90;
 
-     /* lock the viewing orientation angles */
-     getViewOrientation(&view_x, &view_y, &view_z);
-     if (view_y > 45) view_y = 45;
-     if (view_y < -45) view_y = -45;
+       setMobPosition(0, mob0_x, mob0_y, mob0_z, mob0_rot);
 
-	   /* Mob 0 */
-     static float mob0_x = 25, mob0_y = 25, mob0_z = 25;
-     static float mob0_rot = -90;
+       /* Mob 1 */
+       static float mob1_x = 25, mob1_y = 27, mob1_z = 35;
+       static float mob1_rot = 0;
 
-     setMobPosition(0, mob0_x, mob0_y, mob0_z, mob0_rot);
+       setMobPosition(1, mob1_x, mob1_y, mob1_z, mob1_rot);
 
-     /* Mob 1 */
-     static float mob1_x = 25, mob1_y = 27, mob1_z = 35;
-     static float mob1_rot = 0;
+       /* gravity checks one square below (y) the current position*/
+       if ((world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) && !flycontrol) {
+         camera_y+=0.1;
+         setViewPosition(camera_x, camera_y, camera_z);
+       }
 
-     setMobPosition(1, mob1_x, mob1_y, mob1_z, mob1_rot);
+       /* shooting */
+       if (projState == 1) {
+         setMobPosition(9, camera_x*-1, camera_y*-1, camera_z*-1, view_y);
+         projX = camera_x*-1;
+         projZ = camera_z*-1;
+         projState = 2;
+       } else if (projState == 2) {
+           projX += x_velocity*projSpeed;
+           projZ += z_velocity*projSpeed;
+           setMobPosition(9, projX, camera_y*-1, projZ, 0);
+           //if projectile collides with something
+           if (world[(int)projX][(int)camera_y*-1][(int)projZ] != 0) {
+              setMobPosition(9, WORLDX, WORLDY, WORLDZ, 0);
+              hideMob(9);
+              projState = 0;
+              //also delete wall if internal
+              if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 2) {
+                  world[(int)projX][(int)camera_y*-1][(int)projZ] = 0;
+              }
+           }
 
-     /* gravity checks one square below (y) the current position*/
-     if ((world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) && !flycontrol) {
-       camera_y+=0.1;
-       setViewPosition(camera_x, camera_y, camera_z);
-     }
-
-     /* shooting */
-     if (projState == 1) {
-       setMobPosition(9, camera_x*-1, camera_y*-1, camera_z*-1, view_y);
-       projX = camera_x*-1;
-       projZ = camera_z*-1;
-       projState = 2;
-     } else if (projState == 2) {
-         projX += x_velocity*projSpeed;
-         projZ += z_velocity*projSpeed;
-         setMobPosition(9, projX, camera_y*-1, projZ, 0);
-         //if projectile collides with something
-         if (world[(int)projX][(int)camera_y*-1][(int)projZ] != 0) {
-            setMobPosition(9, WORLDX, WORLDY, WORLDZ, 0);
-            hideMob(9);
-            projState = 0;
-            //also delete wall if internal
-            if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 2) {
-                world[(int)projX][(int)camera_y*-1][(int)projZ] = 0;
-            }
-         }
+       }
 
      }
 
@@ -350,7 +367,6 @@ float *la;
 void mouse(int button, int state, int x, int y) {
 
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-      printf("pew\n");
       projState = 1;
       createMob(9, camera_x*-1, camera_y*-1, camera_z*-1, 0);
       getViewOrientation(&view_x, &view_y, &view_z);
@@ -359,14 +375,11 @@ void mouse(int button, int state, int x, int y) {
       while (view_y >= 360) view_y -= 360;
       while (view_z >= 360) view_z -= 360;
 
-      printf("%lf, %lf %lf\n", view_x, view_y, view_z);
       //convert to radians
       view_y = (view_y*M_PI)/180;
 
       x_velocity = sin(view_y);
       z_velocity = -cos(view_y);
-
-      printf("%lf %lf\n", x_velocity, z_velocity);
 
     }
 
@@ -473,9 +486,6 @@ int i, j, k;
 
    }
 
-   /* initialize animation timer */
-   srand(time(NULL));
-   glutTimerFunc(100, timedAnimation, 0);
 	/* starts the graphics processing loop */
 	/* code after this will not run until the program exits */
    glutMainLoop();

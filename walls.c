@@ -119,7 +119,6 @@ void animateWall(int n) {
 
   int i;
   int animX, animZ;
-
   if (n < 14) {
 
     if (wallType == 0) {
@@ -132,16 +131,12 @@ void animateWall(int n) {
 
     for (i = 25; i < 30; i++) {
 
-      if (wallToggle == 0 && world[animX][i][animZ] == 0) {
+      if (wallToggle == 0 && world[animX][i][animZ] == 0)
         world[animX][i][animZ] = 5;
-
-      } else if (wallToggle == 1 && world[animX][i][animZ] == 5){
+      else if (wallToggle == 1 && world[animX][i][animZ] == 5)
         world[animX][i][animZ] = 0;
-      }
 
     }
-
-    glutTimerFunc(200, animateWall, n+1);
 
   } else {
     if (wallToggle == 0) wallToggle = 1;
@@ -162,8 +157,6 @@ void selectWall() {
     else changedWall = V_Walls[wallVar2][wallVar1];
 
   } while (changedWall.enabled != wallToggle);
-
-  glutTimerFunc(200, animateWall, 0);
 
   if (wallToggle == 1) {
     if (wallType == 0) H_Walls[wallVar1][wallVar2].enabled = 0;
