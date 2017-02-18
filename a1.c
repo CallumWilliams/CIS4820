@@ -13,29 +13,15 @@
 #include <time.h>
 
 #include "graphics.h"
-
-typedef struct PULSAR_WALL {
-
-   int STARTX, STARTZ;
-   int ENDX, ENDZ;
-   int orientation; //0 = horizontal, 1 = vertical
-   int enabled; //0 = false, 1 = true
-
-}Walls;
+#include "walls.h"
 
   /* global variables for player position */
 static float camera_x = -7, camera_y = -30, camera_z = -7;
 static float player_rot = 0;
 
   /* global variable for wall locations */
-Walls V_Walls[5][6];
-Walls H_Walls[6][5];
-
-  /* wall animation variables */
-Walls changedWall;
-int wallX, wallZ; //position of animated wall
-int wallType; //type; 0 = horizontal, 1 = vertical
-int wallToggle = 0; //toggle variable; 0 = add wall, 1 = remove wall
+extern Walls V_Walls[5][6];
+extern Walls H_Walls[6][5];
 
 static time_t gameStart; //gets start time of game code
 int projState = 0; //0 = not on board, 1 = generate, 2 = moving
@@ -124,19 +110,17 @@ void collisionResponse() {
   if (world[(int)(((camera_x)*-1))][(int)(((camera_y)*-1))][(int)(((camera_z)*-1))] != 0) {
     //climbing detection - checks the spot directly above current collided block
     if (world[(int)(((camera_x)*-1))][(int)(((camera_y)*-1)+1)][(int)(((camera_z)*-1))] == 0) {
-      printf("init\n");
       camera_y -= 1;
     } else {
       camera_x = oldX; camera_y = oldY; camera_z = oldZ;
     }
 
   //out of bounds
-  } else if (((camera_x)*-1 > WORLDX) || ((camera_x)*-1 < 0) || ((camera_y)*-1 > WORLDY) || ((camera_y)*-1 < 0) || ((camera_z)*-1 > WORLDZ) || ((camera_z)*-1 < 0)) {
-    camera_x = oldX; camera_y = oldY; camera_z = oldZ;
+  //} else if (((camera_x)*-1 > WORLDX) || ((camera_x)*-1 < 0) || ((camera_y)*-1 > WORLDY) || ((camera_y)*-1 < 0) || ((camera_z)*-1 > WORLDZ) || ((camera_z)*-1 < 0)) {
+    //camera_x = oldX; camera_y = oldY; camera_z = oldZ;
 }
 
   setViewPosition(camera_x, camera_y, camera_z);
-  setPlayerPosition(0, ((camera_x)*-1)-0.5, (camera_y)*-1, ((camera_z)*-1)-0.5, player_rot);
 
 }
 
@@ -171,117 +155,12 @@ void draw2D() {
 
 }
 
-void drawWall(Walls w) {
-
-  int i, j;
-
-  if (w.orientation == 0) {//horizontal
-
-     for (i = w.STARTX+1; i < w.ENDX; i++) {
-        for (j = 25; j < 30; j++) {
-          world[i][j][w.STARTZ] = 5;
-        }
-     }
-
-  } else {//vertical
-
-     for (i = w.STARTZ+1; i < w.ENDZ; i++) {
-        for (j = 25; j < 30; j++) {
-          world[w.STARTX][j][i] = 5;
-        }
-     }
-
-  }
-
-}
-
-void removeWall(Walls w) {
-
-   int i, j;
-
-   if (w.orientation == 0) {//horizontal
-
-      for (i = w.STARTX+1; i < w.ENDX; i++) {
-         for (j = 25; j < 30; j++) {
-            world[i][j][w.STARTZ] = 0;
-         }
-      }
-
-   } else {//vertical
-
-      for (i = w.STARTZ+1; i < w.ENDZ; i++) {
-         for (j = 25; j < 30; j++) {
-            world[w.STARTX][j][i] = 0;
-         }
-      }
-
-   }
-
-}
-
-void animateWall(int n) {
-
-  int i;
-  int animX, animZ;
-
-  if (!(n == 15)) {
-
-    if (wallType == 0) {
-      animX = H_Walls[wallX][wallZ].STARTX + n;
-      animZ = H_Walls[wallX][wallZ].STARTZ;
-    } else {
-      animX = V_Walls[wallX][wallZ].STARTX;
-      animZ = V_Walls[wallX][wallZ].STARTZ + n;
-    }
-
-    if (world[animX][25][animZ] != 6) { //if it's not a pillar
-
-      for (i = 25; i < 30; i++) {
-
-        if (wallToggle == 0 && world[animX][i][animZ] == 0) {
-          world[animX][i][animZ] = 5;
-        } else if (wallToggle == 1 && world[animX][i][animZ] == 5){
-          world[animX][i][animZ] = 0;
-        }
-
-      }
-
-    }
-
-    glutTimerFunc(200, animateWall, n+1);
-
-  }
-
-}
-
-void selectWall() {
-
-  srand(time(NULL));
-
-  do {
-
-    wallX = rand() % 6 + 1;
-    wallZ = rand() % 6 + 1;
-    wallType = rand() % 2 + 1;
-
-    if (wallType == 0) changedWall = H_Walls[wallX][wallZ];
-    else changedWall = V_Walls[wallX][wallZ];
-
-  } while (changedWall.enabled != wallToggle);
+void timedAnimation() {
 
   glutTimerFunc(200, animateWall, 0);
 
-  if (wallToggle == 1) {
-    if (wallType == 0) H_Walls[wallX][wallZ].enabled = 0;
-    else V_Walls[wallX][wallZ].enabled = 0;
-    wallToggle = 0;
-  } else {
-    if (wallType == 0) H_Walls[wallX][wallZ].enabled = 1;
-    else V_Walls[wallX][wallZ].enabled = 1;
-    wallToggle = 1;
-  }
 
-  glutTimerFunc(7500, selectWall, 5);
+
 }
 
 	/*** update() ***/
@@ -464,14 +343,14 @@ int i, j, k;
       /* boundary box */
       for (i = 0; i < 90-1; i++) {
          for (j = 25; j < 30; j++) {
-            world[i][j][0] = 2;
-            world[i][j][89] = 2;
+            world[i][j][0] = 6;
+            world[i][j][89] = 6;
          }
       }
       for (i = 0; i < 90; i++) {
          for (j = 25; j < 30; j++) {
-            world[0][j][i] = 2;
-            world[89][j][i] = 2;
+            world[0][j][i] = 6;
+            world[89][j][i] = 6;
          }
       }
 
@@ -488,31 +367,25 @@ int i, j, k;
       for (i = 0; i < 5; i++) {
          for (j = 0; j < 6; j++) {
             V_Walls[i][j].STARTX = (i*15) + 15;
-            V_Walls[i][j].STARTZ = j*15;
+            V_Walls[i][j].STARTZ = (j*15) + 1;
             V_Walls[i][j].ENDX = V_Walls[i][j].STARTX;
-            V_Walls[i][j].ENDZ = (j*15) + 15;
+            V_Walls[i][j].ENDZ = (j*15) + 14;
             V_Walls[i][j].orientation = 1;
             V_Walls[i][j].enabled = 0;
-            if (i == 5)
-              V_Walls[i][j].ENDZ -= 1;
-            if (j == 5)
-              V_Walls[i][j].ENDZ -= 1;
+            printf("v %d %d starts (%d %d) ends (%d %d)\n", i, j, V_Walls[i][j].STARTX, V_Walls[i][j].STARTZ, V_Walls[i][j].ENDX, V_Walls[i][j].ENDZ);
          }
       }
 
       /* set horizontal wall positions */
       for (i = 0; i < 6; i++) {
          for (j = 0; j < 5; j++) {
-            H_Walls[i][j].STARTX = i*15;
+            H_Walls[i][j].STARTX = (i*15) + 1;
             H_Walls[i][j].STARTZ = (j*15) + 15;
-            H_Walls[i][j].ENDX = (i*15) + 15;
+            H_Walls[i][j].ENDX = (i*15) + 14;
             H_Walls[i][j].ENDZ = H_Walls[i][j].STARTZ;
             H_Walls[i][j].orientation = 0;
             H_Walls[i][j].enabled = 0;
-            if (i == 5)
-              H_Walls[i][j].ENDX -= 1;
-            if (j == 5)
-              H_Walls[i][j].ENDX -= 1;
+            printf("h %d %d starts (%d %d) ends (%d %d)\n", i, j, H_Walls[i][j].STARTX, H_Walls[i][j].STARTZ, H_Walls[i][j].ENDX, H_Walls[i][j].ENDZ);
          }
       }
 
@@ -555,7 +428,7 @@ int i, j, k;
    }
 
    /* initialize animation timer */
-   glutTimerFunc(100, selectWall, 5);
+   glutTimerFunc(100, timedAnimation, 0);
 	/* starts the graphics processing loop */
 	/* code after this will not run until the program exits */
    glutMainLoop();
