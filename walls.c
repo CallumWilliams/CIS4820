@@ -11,7 +11,7 @@ Walls H_Walls[6][5];
 Walls changedWall;
 int wallVar1, wallVar2; //position of animated wall
 int wallType; //type; 0 = horizontal, 1 = vertical
-int wallToggle = 0; //toggle variable; 0 = add wall, 1 = remove wall
+int wallToggle = 0; //toggle variable; 0 = wall disabled, add wall, 1 = wall enabled, remove wall
 
 void drawWall(Walls w) {
 
@@ -61,12 +61,66 @@ void removeWall(Walls w) {
 
 }
 
+void generateWalls() {
+
+  int i, j;
+  /* set vertical wall positions */
+  for (i = 0; i < 5; i++) {
+     for (j = 0; j < 6; j++) {
+        V_Walls[i][j].STARTX = (i*15) + 15;
+        V_Walls[i][j].STARTZ = (j*15) + 1;
+        V_Walls[i][j].ENDX = V_Walls[i][j].STARTX;
+        V_Walls[i][j].ENDZ = (j*15) + 14;
+        V_Walls[i][j].orientation = 1;
+        V_Walls[i][j].enabled = 0;
+     }
+  }
+
+  /* set horizontal wall positions */
+  for (i = 0; i < 6; i++) {
+     for (j = 0; j < 5; j++) {
+        H_Walls[i][j].STARTX = (i*15) + 1;
+        H_Walls[i][j].STARTZ = (j*15) + 15;
+        H_Walls[i][j].ENDX = (i*15) + 14;
+        H_Walls[i][j].ENDZ = H_Walls[i][j].STARTZ;
+        H_Walls[i][j].orientation = 0;
+        H_Walls[i][j].enabled = 0;
+     }
+  }
+
+  int wallChance; int wallCount = 0;
+  srand(time(NULL));
+
+  for (i = 0; i < 5; i++) {
+     for (j = 0; j < 6; j++) {
+        wallChance = rand() % 100 + 1;
+        if (wallChance <= 30 && wallCount < 25) {
+          drawWall(V_Walls[i][j]);
+          V_Walls[i][j].enabled = 1;
+          wallCount++;
+        }
+     }
+  }
+
+  for (i = 0; i < 6; i++) {
+     for (j = 0; j < 6; j++) {
+        wallChance = rand() % 100 + 1;
+        if (wallChance <= 30 && wallCount < 20) {
+          drawWall(H_Walls[i][j]);
+          H_Walls[i][j].enabled = 1;
+          wallCount++;
+        }
+     }
+  }
+
+}
+
 void animateWall(int n) {
 
   int i;
   int animX, animZ;
 
-  if (n <= 14) {
+  if (n < 14) {
 
     if (wallType == 0) {
       animX = H_Walls[wallVar1][wallVar2].STARTX + n;
@@ -80,29 +134,26 @@ void animateWall(int n) {
     else
       printf("removing %d %d\n", animX, animZ);
 
-    if (world[animX][25][animZ] != 6) { //if it's not a pillar
+    for (i = 25; i < 30; i++) {
 
-      for (i = 25; i < 30; i++) {
-
-        if (wallToggle == 0) {
-          world[animX][i][animZ] = 5;
-        } else {
-          world[animX][i][animZ] = 0;
-        }
-
+      if (wallToggle == 0) {
+        world[animX][i][animZ] = 5;
+      } else {
+        world[animX][i][animZ] = 0;
       }
 
     }
 
     glutTimerFunc(200, animateWall, n+1);
 
+  } else {
+    if (wallToggle == 0) wallToggle = 1;
+    else wallToggle = 0;
   }
 
 }
 
 void selectWall() {
-
-  srand(time(NULL));
 
   do {
 
@@ -125,12 +176,9 @@ void selectWall() {
   if (wallToggle == 1) {
     if (wallType == 0) H_Walls[wallVar1][wallVar2].enabled = 0;
     else V_Walls[wallVar2][wallVar1].enabled = 0;
-    wallToggle = 0;
   } else {
     if (wallType == 0) H_Walls[wallVar1][wallVar2].enabled = 1;
     else V_Walls[wallVar2][wallVar1].enabled = 1;
-    wallToggle = 1;
   }
 
-  glutTimerFunc(7500, selectWall, 5);
 }

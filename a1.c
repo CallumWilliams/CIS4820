@@ -104,7 +104,6 @@ void collisionResponse() {
 
   getOldViewPosition(&oldX, &oldY, &oldZ);
   getViewPosition(&camera_x, &camera_y, &camera_z);
-  printf("%lf %lf %lf to %lf %lf %lf\n", oldX, oldY, oldZ, camera_x, camera_y, camera_z);
 
   //collision detection
   if (world[(int)(((camera_x)*-1))][(int)(((camera_y)*-1))][(int)(((camera_z)*-1))] != 0) {
@@ -116,8 +115,8 @@ void collisionResponse() {
     }
 
   //out of bounds
-  //} else if (((camera_x)*-1 > WORLDX) || ((camera_x)*-1 < 0) || ((camera_y)*-1 > WORLDY) || ((camera_y)*-1 < 0) || ((camera_z)*-1 > WORLDZ) || ((camera_z)*-1 < 0)) {
-    //camera_x = oldX; camera_y = oldY; camera_z = oldZ;
+  } else if (((camera_x)*-1 > WORLDX) || ((camera_x)*-1 < 0) || ((camera_y)*-1 > WORLDY) || ((camera_y)*-1 < 0) || ((camera_z)*-1 > WORLDZ) || ((camera_z)*-1 < 0)) {
+    camera_x = oldX; camera_y = oldY; camera_z = oldZ;
 }
 
   setViewPosition(camera_x, camera_y, camera_z);
@@ -157,9 +156,8 @@ void draw2D() {
 
 void timedAnimation() {
 
-  glutTimerFunc(200, animateWall, 0);
-
-
+  selectWall();
+  glutTimerFunc(5000, timedAnimation, 0);
 
 }
 
@@ -363,56 +361,7 @@ int i, j, k;
          }
       }
 
-      /* set vertical wall positions */
-      for (i = 0; i < 5; i++) {
-         for (j = 0; j < 6; j++) {
-            V_Walls[i][j].STARTX = (i*15) + 15;
-            V_Walls[i][j].STARTZ = (j*15) + 1;
-            V_Walls[i][j].ENDX = V_Walls[i][j].STARTX;
-            V_Walls[i][j].ENDZ = (j*15) + 14;
-            V_Walls[i][j].orientation = 1;
-            V_Walls[i][j].enabled = 0;
-            printf("v %d %d starts (%d %d) ends (%d %d)\n", i, j, V_Walls[i][j].STARTX, V_Walls[i][j].STARTZ, V_Walls[i][j].ENDX, V_Walls[i][j].ENDZ);
-         }
-      }
-
-      /* set horizontal wall positions */
-      for (i = 0; i < 6; i++) {
-         for (j = 0; j < 5; j++) {
-            H_Walls[i][j].STARTX = (i*15) + 1;
-            H_Walls[i][j].STARTZ = (j*15) + 15;
-            H_Walls[i][j].ENDX = (i*15) + 14;
-            H_Walls[i][j].ENDZ = H_Walls[i][j].STARTZ;
-            H_Walls[i][j].orientation = 0;
-            H_Walls[i][j].enabled = 0;
-            printf("h %d %d starts (%d %d) ends (%d %d)\n", i, j, H_Walls[i][j].STARTX, H_Walls[i][j].STARTZ, H_Walls[i][j].ENDX, H_Walls[i][j].ENDZ);
-         }
-      }
-
-      int wallChance; int wallCount = 0;
-      srand(time(NULL));
-
-      for (i = 0; i < 5; i++) {
-         for (j = 0; j < 6; j++) {
-            wallChance = rand() % 100 + 1;
-            if (wallChance <= 30 && wallCount < 20) {
-              drawWall(V_Walls[i][j]);
-              V_Walls[i][j].enabled = 1;
-              wallCount++;
-            }
-         }
-      }
-
-      for (i = 0; i < 6; i++) {
-         for (j = 0; j < 6; j++) {
-            wallChance = rand() % 100 + 1;
-            if (wallChance <= 30 && wallCount < 20) {
-              drawWall(H_Walls[i][j]);
-              H_Walls[i][j].enabled = 1;
-              wallCount++;
-            }
-         }
-      }
+      generateWalls();
 
       /* place climbing test */
       world[10][25][5] = 4;
@@ -428,6 +377,7 @@ int i, j, k;
    }
 
    /* initialize animation timer */
+   srand(time(NULL));
    glutTimerFunc(100, timedAnimation, 0);
 	/* starts the graphics processing loop */
 	/* code after this will not run until the program exits */
