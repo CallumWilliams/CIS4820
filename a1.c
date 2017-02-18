@@ -15,16 +15,23 @@
 #include "graphics.h"
 #include "walls.h"
 
+#define M_PI 3.14159265358979323846
+
   /* global variables for player position */
 static float camera_x = -7, camera_y = -30, camera_z = -7;
-static float player_rot = 0;
+static float view_x, view_y, view_z;
 
   /* global variable for wall locations */
 extern Walls V_Walls[5][6];
 extern Walls H_Walls[6][5];
 
 static time_t gameStart; //gets start time of game code
-int projState = 0; //0 = not on board, 1 = generate, 2 = moving
+
+/* projectile global variables */
+static int projState = 0; //0 = not on board, 1 = generate, 2 = moving
+static float x_velocity, z_velocity;
+static float projX, projZ;
+static float projSpeed = 0.25;
 
 	/* mouse function called by GLUT when a button is pressed or released */
 void mouse(int, int, int, int);
@@ -161,9 +168,9 @@ void draw2D() {
        getViewPosition(&camera_x, &camera_y, &camera_z);
 
 
-       for (i = 0; i <= 90; i++) {
+       for (i = 0; i < 90; i++) {
 
-         for (j = 0; j <= 90; j++) {
+         for (j = 0; j < 90; j++) {
 
            switch(world[j][25][i]) {
              case 0: //nothing (ground) case
@@ -185,9 +192,9 @@ void draw2D() {
 
      } else if (displayMap == 2) { //primary display
 
-       for (i = 0; i <= 90; i++) {
+       for (i = 0; i < 90; i++) {
 
-         for (j = 0; j <= 90; j++) {
+         for (j = 0; j < 90; j++) {
 
            switch(world[j][25][i]) {
              case 0: //nothing (ground) case
@@ -207,16 +214,7 @@ void draw2D() {
 
        }
 
-     } else { //no display
-
      }
-
-
-
-      /* draw player */
-      /* draw pillars */
-      /* draw walls */
-      /* draw background */
 
    }
 
@@ -295,8 +293,10 @@ float *la;
 
      /* Assignment Update Code */
 
-     /* player info */
-     setPlayerPosition(0, ((camera_x)*-1)-0.5, (camera_y)*-1, ((camera_z)*-1)-0.5, player_rot);
+     /* lock the viewing orientation angles */
+     getViewOrientation(&view_x, &view_y, &view_z);
+     if (view_y > 45) view_y = 45;
+     if (view_y < -45) view_y = -45;
 
 	   /* Mob 0 */
      static float mob0_x = 25, mob0_y = 25, mob0_z = 25;
@@ -318,9 +318,24 @@ float *la;
 
      /* shooting */
      if (projState == 1) {
-       setMobPosition(9, camera_x*-1, camera_y*-1, camera_z*-1, 0);
+       setMobPosition(9, camera_x*-1, camera_y*-1, camera_z*-1, view_y);
+       projX = camera_x*-1;
+       projZ = camera_z*-1;
        projState = 2;
      } else if (projState == 2) {
+         projX += x_velocity*projSpeed;
+         projZ += z_velocity*projSpeed;
+         setMobPosition(9, projX, camera_y*-1, projZ, 0);
+         //if projectile collides with something
+         if (world[(int)projX][(int)camera_y*-1][(int)projZ] != 0) {
+            setMobPosition(9, WORLDX, WORLDY, WORLDZ, 0);
+            hideMob(9);
+            projState = 0;
+            //also delete wall if internal
+            if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 2) {
+                world[(int)projX][(int)camera_y*-1][(int)projZ] = 0;
+            }
+         }
 
      }
 
@@ -334,12 +349,26 @@ float *la;
 	/*  released */
 void mouse(int button, int state, int x, int y) {
 
-   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && projState == 0) {
-     printf("pew\n");
-     projState = 1;
-     createMob(9, camera_x*-1, camera_y*-1, camera_z*-1, 0);
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+      printf("pew\n");
+      projState = 1;
+      createMob(9, camera_x*-1, camera_y*-1, camera_z*-1, 0);
+      getViewOrientation(&view_x, &view_y, &view_z);
+      /* temporary angle normalizer (float mod integer didn't work) */
+      while (view_x >= 360) view_x -= 360;
+      while (view_y >= 360) view_y -= 360;
+      while (view_z >= 360) view_z -= 360;
 
-   }
+      printf("%lf, %lf %lf\n", view_x, view_y, view_z);
+      //convert to radians
+      view_y = (view_y*M_PI)/180;
+
+      x_velocity = sin(view_y);
+      z_velocity = -cos(view_y);
+
+      printf("%lf %lf\n", x_velocity, z_velocity);
+
+    }
 
 }
 
@@ -406,6 +435,17 @@ int i, j, k;
          }
       }
 
+      /* build pillars */
+      for (i = 1; i < 6; i++) {
+         for (j = 1; j < 6; j++) {
+            for (k = 25; k < 30; k++) {
+               world[i*15][k][j*15] = 6;
+            }
+         }
+      }
+
+      generateWalls();
+
       /* boundary box */
       for (i = 0; i < 90-1; i++) {
          for (j = 25; j < 30; j++) {
@@ -419,17 +459,6 @@ int i, j, k;
             world[89][j][i] = 6;
          }
       }
-
-      /* build pillars */
-      for (i = 1; i < 6; i++) {
-         for (j = 1; j < 6; j++) {
-            for (k = 25; k < 30; k++) {
-               world[i*15][k][j*15] = 6;
-            }
-         }
-      }
-
-      generateWalls();
 
       /* place climbing test */
       world[10][25][5] = 4;

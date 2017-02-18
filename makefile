@@ -10,5 +10,5 @@ wall: walls.c walls.h graphic visible
 graphic: graphics.c graphics.h
 	gcc -c graphics.c -o graphics.o $(INCLUDES)
 
-visible:
+visible: visible.c graphics.h
 	gcc -c visible.c -o visible.o $(INCLUDES)
