@@ -177,12 +177,19 @@ void draw2D() {
 
        // draw mob/projectiles
        set2Dcolour(red);
-       for (i = 0; i < 10; i++)
+       for (i = 0; i < 9; i++)
           if (mobEnabled[i] == 1)
             draw2Dbox(screenWidth-190+((int)mob_z[i]*2),
                       screenHeight-190+((int)mob_x[i]*2),
                       screenWidth-190+((int)mob_z[i]*2)+5,
                       screenHeight-190+((int)mob_x[i]*2)+5);
+
+      //projectile in use - draw
+      if (projState)
+          draw2Dbox(screenWidth-190+((int)projZ*2),
+                    screenHeight-190+((int)projX*2),
+                    screenWidth-190+((int)projZ*2)+5,
+                    screenHeight-190+((int)projX*2)+5);
 
        for (i = 0; i < 90; i++) {
 
@@ -221,12 +228,19 @@ void draw2D() {
 
        //draw mobs/projectiles
        set2Dcolour(red);
-       for (i = 0; i < 10; i++)
+       for (i = 0; i < 9; i++)
           if (mobEnabled[i] == 1)
             draw2Dbox((screenWidth/4)+((int)mob_z[i]*4)+5,
                       (screenHeight/4)+((int)mob_x[i]*4)+5,
                       (screenWidth/4)+((int)mob_z[i]*4)+15,
                       (screenHeight/4)+((int)mob_x[i]*4)+15);
+
+      //projectile in use - draw
+      if (projState)
+          draw2Dbox((screenWidth/4)+((int)projZ*4)+5,
+                    (screenHeight/4)+((int)projX*4)+5,
+                    (screenWidth/4)+((int)projZ*4)+15,
+                    (screenHeight/4)+((int)projX*4)+15);
 
        for (i = 0; i < 90; i++) {
 
@@ -264,7 +278,7 @@ void timedAnimation() {
   if (n == 0) selectWall();
   if (n >= 0 && n < 16) animateWall(n);
   n++;
-  if (n == 160) n = 0;
+  if (n == 160) n = 0; //160 adds buffer room (allows for timing between wall animations)
 
 }
 
@@ -337,6 +351,12 @@ float *la;
      //update can occur - execute
      if ((float)(gameElapsed/MILLISECONDS_PER_UPDATE) == (int)(gameElapsed/MILLISECONDS_PER_UPDATE)) {
        timedAnimation();
+
+       //lock viewing angle
+       getViewOrientation(&view_x, &view_y, &view_z);
+       if (view_x > 405) view_x = 405;
+       else if (view_x < 315) view_x = 315;
+       setViewOrientation(view_x, view_y, view_z);
 
        mob_x[0] = 25; mob_y[0] = 25; mob_z[0] = 25;
        setMobPosition(0, mob_x[0], mob_y[0], mob_z[0], mob_rot[0]);
