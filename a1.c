@@ -21,6 +21,9 @@
 static float camera_x = -7, camera_y = -30, camera_z = -7;
 static float view_x, view_y, view_z;
 
+static int mobEnabled[] = {0, 0, 0, 0, 0, 0, 0, 0, 0}; //0 = false, 1 = true
+static float mob_x[10], mob_y[10], mob_z[10], mob_rot[10];
+
   /* global variable for wall locations */
 extern Walls V_Walls[5][6];
 extern Walls H_Walls[6][5];
@@ -163,12 +166,25 @@ void draw2D() {
 
      if (displayMap == 1) { //top-right corner
 
+       // draw player
        set2Dcolour(yellow);
        getViewPosition(&camera_x, &camera_y, &camera_z);
        draw2Dbox(screenWidth-190+((int)camera_z*-2),
                  screenHeight-190+((int)camera_x*-2),
                  screenWidth-190+((int)camera_z*-2)+5,
                  screenHeight-190+((int)camera_x*-2)+5);
+
+       // draw mob/projectiles
+       set2Dcolour(red);
+       for (i = 0; i < 10; i++)
+          if (mobEnabled[i] == 1) {
+            draw2Dbox(screenWidth-190+((int)mob_z[i]*2),
+                      screenHeight-190+((int)mob_x[i]*2),
+                      screenWidth-190+((int)mob_z[i]*2)+5,
+                      screenHeight-190+((int)mob_x[i]*2)+5);
+            printf("%lf, %lf\n", mob_z[i], mob_x[i]);
+          }
+
 
        for (i = 0; i < 90; i++) {
 
@@ -313,17 +329,13 @@ float *la;
      //update can occur - execute
      if ((float)(gameElapsed/MILLISECONDS_PER_UPDATE) == (int)(gameElapsed/MILLISECONDS_PER_UPDATE)) {
        timedAnimation();
-  	   /* Mob 0 */
-       static float mob0_x = 25, mob0_y = 25, mob0_z = 25;
-       static float mob0_rot = -90;
 
-       setMobPosition(0, mob0_x, mob0_y, mob0_z, mob0_rot);
-
-       /* Mob 1 */
-       static float mob1_x = 25, mob1_y = 27, mob1_z = 35;
-       static float mob1_rot = 0;
-
-       setMobPosition(1, mob1_x, mob1_y, mob1_z, mob1_rot);
+       mob_x[0] = 25; mob_y[0] = 25; mob_z[0] = 25;
+       setMobPosition(0, mob_x[0], mob_y[0], mob_z[0], mob_rot[0]);
+       mobEnabled[0] = 1;
+       mob_x[1] = 33; mob_y[1] = 27; mob_z[1] = 22;
+       setMobPosition(1, mob_x[1], mob_y[1], mob_z[1], mob_rot[1]);
+       mobEnabled[1] = 1;
 
        /* gravity checks one square below (y) the current position*/
        if ((world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) && !flycontrol) {
@@ -333,7 +345,7 @@ float *la;
 
        /* shooting */
        if (projState == 1) {
-         setMobPosition(9, camera_x*-1, camera_y*-1, camera_z*-1, view_y);
+         setMobPosition(9, camera_x*-1, camera_y*-1, camera_z*-1, view_z);
          projX = camera_x*-1;
          projZ = camera_z*-1;
          projState = 2;
@@ -347,9 +359,8 @@ float *la;
               hideMob(9);
               projState = 0;
               //also delete wall if internal
-              if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 2) {
+              if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 5)
                   world[(int)projX][(int)camera_y*-1][(int)projZ] = 0;
-              }
            }
 
        }
@@ -369,6 +380,7 @@ void mouse(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
       projState = 1;
       createMob(9, camera_x*-1, camera_y*-1, camera_z*-1, 0);
+      mobEnabled[9] = 1;
       getViewOrientation(&view_x, &view_y, &view_z);
       /* temporary angle normalizer (float mod integer didn't work) */
       while (view_x >= 360) view_x -= 360;
@@ -481,8 +493,11 @@ int i, j, k;
       /* place player/entities */
       setViewPosition(camera_x, camera_y, camera_z);
       createMob(0, 25, 25, 25, -90);
+      mobEnabled[0] = 1;
       createMob(1, 25, 27, 35, 0);
+      mobEnabled[1] = 1;
       createMob(2, 80, 27, 35, 0);
+      mobEnabled[2] = 1;
 
    }
 
