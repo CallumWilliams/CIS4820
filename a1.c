@@ -27,6 +27,7 @@ static float mob_x[10], mob_y[10], mob_z[10], mob_rot[10];
   /* global variable for wall locations */
 extern Walls V_Walls[5][6];
 extern Walls H_Walls[6][5];
+extern int wallToggle;
 static int n; //wall animation timer
 
 /* projectile global variables */
@@ -177,14 +178,11 @@ void draw2D() {
        // draw mob/projectiles
        set2Dcolour(red);
        for (i = 0; i < 10; i++)
-          if (mobEnabled[i] == 1) {
+          if (mobEnabled[i] == 1)
             draw2Dbox(screenWidth-190+((int)mob_z[i]*2),
                       screenHeight-190+((int)mob_x[i]*2),
                       screenWidth-190+((int)mob_z[i]*2)+5,
                       screenHeight-190+((int)mob_x[i]*2)+5);
-            printf("%lf, %lf\n", mob_z[i], mob_x[i]);
-          }
-
 
        for (i = 0; i < 90; i++) {
 
@@ -213,12 +211,22 @@ void draw2D() {
 
      } else if (displayMap == 2) { //primary display
 
+       //draw player
        set2Dcolour(yellow);
        getViewPosition(&camera_x, &camera_y, &camera_z);
-       draw2Dbox((screenWidth/4)+((int)camera_z*-4),
-                 (screenHeight/4)+((int)camera_x*-4),
-                 (screenWidth/4)+((int)camera_z*-4),
-                 (screenHeight/4)+((int)camera_x*-4));
+       draw2Dbox((screenWidth/4)+((int)camera_z*-4)+5,
+                 (screenHeight/4)+((int)camera_x*-4)+5,
+                 (screenWidth/4)+((int)camera_z*-4)+15,
+                 (screenHeight/4)+((int)camera_x*-4)+15);
+
+       //draw mobs/projectiles
+       set2Dcolour(red);
+       for (i = 0; i < 10; i++)
+          if (mobEnabled[i] == 1)
+            draw2Dbox((screenWidth/4)+((int)mob_z[i]*4)+5,
+                      (screenHeight/4)+((int)mob_x[i]*4)+5,
+                      (screenWidth/4)+((int)mob_z[i]*4)+15,
+                      (screenHeight/4)+((int)mob_x[i]*4)+15);
 
        for (i = 0; i < 90; i++) {
 
@@ -239,8 +247,8 @@ void draw2D() {
            }
            draw2Dbox((screenWidth/4)+(i*4),
                      (screenHeight/4)+(j*4),
-                     (screenWidth/4)+(i*4)+20,
-                     (screenHeight/4)+(j*4)+20);
+                     (screenWidth/4)+(i*4)+15,
+                     (screenHeight/4)+(j*4)+15);
          }
 
        }
@@ -254,9 +262,9 @@ void draw2D() {
 void timedAnimation() {
 
   if (n == 0) selectWall();
-  if (n == 160) n = 0;
-  else if (n >= 0 && n < 15)animateWall(n);
+  if (n >= 0 && n < 16) animateWall(n);
   n++;
+  if (n == 160) n = 0;
 
 }
 
@@ -377,7 +385,7 @@ float *la;
 	/*  released */
 void mouse(int button, int state, int x, int y) {
 
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && projState == 0) {
       projState = 1;
       createMob(9, camera_x*-1, camera_y*-1, camera_z*-1, 0);
       mobEnabled[9] = 1;

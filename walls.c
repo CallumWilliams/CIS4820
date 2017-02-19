@@ -119,7 +119,7 @@ void animateWall(int n) {
 
   int i;
   int animX, animZ;
-  if (n < 14) {
+  if (n < 15) {
 
     if (wallType == 0) {
       animX = H_Walls[wallVar1][wallVar2].STARTX + n;
