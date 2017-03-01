@@ -12,7 +12,7 @@
 #include <math.h>
 
 #include "graphics.h"
-#include "walls.h"
+#include "utils.h"
 
 #define M_PI 3.14159265358979323846
 #define MILLISECONDS_PER_UPDATE 17 //17*60 = 1020 (or 60 frames/1.02 seconds)
@@ -21,14 +21,17 @@
 static float camera_x = -7, camera_y = -30, camera_z = -7;
 static float view_x, view_y, view_z;
 
-static int mobEnabled[] = {0, 0, 0, 0, 0, 0, 0, 0, 0}; //0 = false, 1 = true
-static float mob_x[10], mob_y[10], mob_z[10], mob_rot[10];
+  /* mob variables */
+extern int mobEnabled[];
+extern float mob_x[10];
+extern float mob_y[10];
+extern float mob_z[10];
 
   /* global variable for wall locations */
 extern Walls V_Walls[5][6];
 extern Walls H_Walls[6][5];
 extern int wallToggle;
-static int n; //wall animation timer
+static int wallTimer; //wall animation timer
 
 /* projectile global variables */
 static int projState = 0; //0 = not on board, 1 = generate, 2 = moving
@@ -275,10 +278,10 @@ void draw2D() {
 
 void timedAnimation() {
 
-  if (n == 0) selectWall();
-  if (n >= 0 && n < 16) animateWall(n);
-  n++;
-  if (n == 160) n = 0; //160 adds buffer room (allows for timing between wall animations)
+  if (wallTimer == 0) selectWall();
+  if (wallTimer >= 0 && wallTimer < 16) animateWall(wallTimer);
+  wallTimer++;
+  if (wallTimer == 160) wallTimer = 0; //160 adds buffer room (allows for timing between wall animations)
 
 }
 
@@ -358,13 +361,6 @@ float *la;
        else if (view_x < 315) view_x = 315;
        setViewOrientation(view_x, view_y, view_z);
 
-       mob_x[0] = 25; mob_y[0] = 25; mob_z[0] = 25;
-       setMobPosition(0, mob_x[0], mob_y[0], mob_z[0], mob_rot[0]);
-       mobEnabled[0] = 1;
-       mob_x[1] = 33; mob_y[1] = 27; mob_z[1] = 22;
-       setMobPosition(1, mob_x[1], mob_y[1], mob_z[1], mob_rot[1]);
-       mobEnabled[1] = 1;
-
        /* gravity checks one square below (y) the current position*/
        if ((world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) && !flycontrol) {
          camera_y+=0.1;
@@ -373,18 +369,18 @@ float *la;
 
        /* shooting */
        if (projState == 1) {
-         setMobPosition(9, camera_x*-1, camera_y*-1, camera_z*-1, view_z);
+         setMobPosition(0, camera_x*-1, camera_y*-1, camera_z*-1, view_z);
          projX = camera_x*-1;
          projZ = camera_z*-1;
          projState = 2;
        } else if (projState == 2) {
            projX += x_velocity*projSpeed;
            projZ += z_velocity*projSpeed;
-           setMobPosition(9, projX, camera_y*-1, projZ, 0);
+           setMobPosition(0, projX, camera_y*-1, projZ, 0);
            //if projectile collides with something
            if (world[(int)projX][(int)camera_y*-1][(int)projZ] != 0) {
-              setMobPosition(9, WORLDX, WORLDY, WORLDZ, 0);
-              hideMob(9);
+              setMobPosition(0, WORLDX, WORLDY, WORLDZ, 0);
+              hideMob(0);
               projState = 0;
               //also delete wall if internal
               if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 5)
@@ -407,8 +403,7 @@ void mouse(int button, int state, int x, int y) {
 
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && projState == 0) {
       projState = 1;
-      createMob(9, camera_x*-1, camera_y*-1, camera_z*-1, 0);
-      mobEnabled[9] = 1;
+      createMob(0, camera_x*-1, camera_y*-1, camera_z*-1, 0);
       getViewOrientation(&view_x, &view_y, &view_z);
       /* temporary angle normalizer (float mod integer didn't work) */
       while (view_x >= 360) view_x -= 360;
@@ -513,19 +508,9 @@ int i, j, k;
          }
       }
 
-      /* place climbing test */
-      world[10][25][5] = 4;
-      world[11][25][5] = 4;
-      world[11][26][5] = 4;
-
       /* place player/entities */
       setViewPosition(camera_x, camera_y, camera_z);
-      createMob(0, 25, 25, 25, -90);
-      mobEnabled[0] = 1;
-      createMob(1, 25, 27, 35, 0);
-      mobEnabled[1] = 1;
-      createMob(2, 80, 27, 35, 0);
-      mobEnabled[2] = 1;
+      renderMob(0, 25, 25, 25, NORTH);
 
    }
 
