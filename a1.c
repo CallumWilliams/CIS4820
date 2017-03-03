@@ -181,11 +181,11 @@ void draw2D() {
        // draw mob/projectiles
        set2Dcolour(red);
        for (i = 0; i < 9; i++)
-          if (mobEnabled[i] == 1)
-            draw2Dbox(screenWidth-190+((int)mob_z[i]*2),
-                      screenHeight-190+((int)mob_x[i]*2),
-                      screenWidth-190+((int)mob_z[i]*2)+5,
-                      screenHeight-190+((int)mob_x[i]*2)+5);
+          if (MOB[i].mobEnabled == 1)
+            draw2Dbox(screenWidth-190+((int)MOB[i].mob_z*2),
+                      screenHeight-190+((int)MOB[i].mob_x*2),
+                      screenWidth-190+((int)MOB[i].mob_z*2)+5,
+                      screenHeight-190+((int)MOB[i].mob_x*2)+5);
 
       //projectile in use - draw
       if (projState)
@@ -232,11 +232,11 @@ void draw2D() {
        //draw mobs/projectiles
        set2Dcolour(red);
        for (i = 0; i < 9; i++)
-          if (mobEnabled[i] == 1)
-            draw2Dbox((screenWidth/4)+((int)mob_z[i]*4)+5,
-                      (screenHeight/4)+((int)mob_x[i]*4)+5,
-                      (screenWidth/4)+((int)mob_z[i]*4)+15,
-                      (screenHeight/4)+((int)mob_x[i]*4)+15);
+          if (MOB[i].mobEnabled == 1)
+            draw2Dbox((screenWidth/4)+((int)MOB[i].mob_z*4)+5,
+                      (screenHeight/4)+((int)MOB[i].mob_x*4)+5,
+                      (screenWidth/4)+((int)MOB[i].mob_z*4)+15,
+                      (screenHeight/4)+((int)MOB[i].mob_x*4)+15);
 
       //projectile in use - draw
       if (projState)
@@ -366,6 +366,9 @@ float *la;
          camera_y+=0.1;
          setViewPosition(camera_x, camera_y, camera_z);
        }
+
+       /* mob movement */
+       moveMob(0);
 
        /* shooting */
        if (projState == 1) {
@@ -511,6 +514,7 @@ int i, j, k;
       /* place player/entities */
       setViewPosition(camera_x, camera_y, camera_z);
       renderMob(0, 25, 25, 25, EAST);
+      rotateMob(0, SOUTH);
 
    }
 
