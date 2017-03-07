@@ -101,7 +101,14 @@ void rotateMob(int mobID, ORIENTATION newO) {
 
 void moveMob(int mobID) {
 
-  printf("mob at %lf, %lf, %lf\n", MOB[mobID].mob_x, MOB[mobID].mob_y, MOB[mobID].mob_z);
+  if (mobID >= MOB_LIMIT) {
+    printf("Mob id cannot exceed %d\n", MOB_LIMIT);
+    exit(0);
+  } else if (!MOB[mobID].mobEnabled) {
+    printf("Mob %d not enabled\n", mobID);
+    exit(0);
+  }
+
   switch (MOB[mobID].mob_rot) {
 
     case NORTH: //UP

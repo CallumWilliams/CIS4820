@@ -386,7 +386,8 @@ float *la;
               hideMob(0);
               projState = 0;
               //also delete wall if internal
-              if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 5)
+              if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 5 ||
+                  world[(int)projX][(int)camera_y*-1][(int)projZ] == 6)
                   world[(int)projX][(int)camera_y*-1][(int)projZ] = 0;
            }
 
@@ -514,7 +515,7 @@ int i, j, k;
       /* place player/entities */
       setViewPosition(camera_x, camera_y, camera_z);
       renderMob(0, 25, 25, 25, EAST);
-      rotateMob(0, SOUTH);
+      eraseMob(0);
 
    }
 
