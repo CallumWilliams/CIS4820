@@ -8,7 +8,7 @@ void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o) {
     exit(0);
   }
 
-  if (world[(int)mobX][(int)mobY][(int)mobZ] != 0) {
+  if (!checkBox((int)mobX, (int)mobY, (int)mobZ)) {
     printf("Mob intersecting with terrain - error\n");
     exit(0);
   }
@@ -19,7 +19,6 @@ void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o) {
   MOB[mobID].mob_rot = o;
 
   //build center
-  printf("drawing mob at %d %d %d\n", (int)mobX, (int)mobY, (int)mobZ);
   world[(int)mobX][(int)mobY][(int)mobZ] = 8;
 
   /*though the mob's "position" is in terms of floats, the actual positions
@@ -63,6 +62,24 @@ void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o) {
 
 }
 
+/*
+  int checkBox(int x, int y, int z)
+  Checks a 3x3 box around the world coordinate (x, z). Checks along the y plane,
+  since that is the 'level' that the mob will be on. Returns 0 (false) if any
+  square is not empty. Otherwise, returns 1 (true).
+*/
+int checkBox(int x, int y, int z) {
+
+  int i, j;
+
+  for (i = x-1; i <= x+1; i++)
+    for (j = z-1; j <= z+1; j++)
+      if (world[i][y][j] != 0) return 0;
+
+  return 1;
+
+}
+
 void eraseMob(int mobID) {
 
   int i, j;
@@ -75,9 +92,21 @@ void eraseMob(int mobID) {
     exit(0);
   }
 
-  for (i = MOB[mobID].mob_x - 2; i <= MOB[mobID].mob_x + 1; i++)
-    for (j = MOB[mobID].mob_z - 2; j <= MOB[mobID].mob_z + 1; j++)
-      world[i][(int)MOB[mobID].mob_y][j] = 0;
+  switch(MOB[mobID].mob_rot) {
+
+    case NORTH:
+    case EAST:
+      for (i = (int)MOB[mobID].mob_x - 2; i <= (int)MOB[mobID].mob_x + 1; i++)
+        for (j = (int)MOB[mobID].mob_z - 2; j <= (int)MOB[mobID].mob_z + 1; j++)
+          world[i][(int)MOB[mobID].mob_y][j] = 0;
+      break;
+    case SOUTH:
+    case WEST:
+      for (i = (int)MOB[mobID].mob_x - 1; i <= (int)MOB[mobID].mob_x + 2; i++)
+        for (j = (int)MOB[mobID].mob_z - 1; j <= (int)MOB[mobID].mob_z + 2; j++)
+          world[i][(int)MOB[mobID].mob_y][j] = 0;
+      break;
+  }
 
   MOB[mobID].mobEnabled = 0;
 
@@ -92,10 +121,8 @@ void rotateMob(int mobID, ORIENTATION newO) {
     exit(0);
   }
 
-  //erase old mob
+  //re-draw
   eraseMob(mobID);
-
-  //re-render
   renderMob(mobID, MOB[mobID].mob_x, MOB[mobID].mob_y, MOB[mobID].mob_z, newO);
 
 }
@@ -109,7 +136,7 @@ void moveMob(int mobID) {
     printf("Mob %d not enabled\n", mobID);
     exit(0);
   }
-
+  
   switch (MOB[mobID].mob_rot) {
 
     case NORTH: //UP
@@ -133,5 +160,56 @@ void moveMob(int mobID) {
   //visual update
   eraseMob(mobID);
   renderMob(mobID, MOB[mobID].mob_x, MOB[mobID].mob_y, MOB[mobID].mob_z, MOB[mobID].mob_rot);
+
+}
+
+/*
+  int hasCollision(int mobID)
+  returns 1 (true) if the head/either of the wings of MOB[mobID] collides with
+  an object (or a non-0 world array element). Otherwise, return 0 (false)
+*/
+int hasCollision(int mobID) {
+
+  switch (MOB[mobID].mob_rot) {
+
+    case NORTH: //UP
+      if (world[(int)MOB[mobID].mob_x+2][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z] != 0)
+        return 1;
+      else if (world[(int)MOB[mobID].mob_x+1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+1] != 0)
+        return 1;
+      else if (world[(int)MOB[mobID].mob_x+1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-1] != 0)
+        return 1;
+      break;
+    case EAST: //RIGHT
+      if (world[(int)MOB[mobID].mob_x][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+2] != 0)
+        return 1;
+      else if (world[(int)MOB[mobID].mob_x+1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+1] != 0)
+        return 1;
+      else if (world[(int)MOB[mobID].mob_x-1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+1] != 0)
+        return 1;
+      break;
+    case SOUTH: //DOWN
+      if (world[(int)MOB[mobID].mob_x-2][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z] != 0)
+        return 1;
+      else if (world[(int)MOB[mobID].mob_x-1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+1] != 0)
+        return 1;
+      else if (world[(int)MOB[mobID].mob_x-1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-1] != 0)
+        return 1;
+      break;
+    case WEST: //LEFT
+      if (world[(int)MOB[mobID].mob_x][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-2] != 0)
+        return 1;
+      else if (world[(int)MOB[mobID].mob_x+1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-1] != 0)
+        return 1;
+      else if (world[(int)MOB[mobID].mob_x-1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-1] != 0)
+        return 1;
+      break;
+    default:
+      printf("orientation error detected\n");
+      exit(0);
+
+  }
+
+  return 0;
 
 }

@@ -368,7 +368,7 @@ float *la;
        }
 
        /* mob movement */
-       moveMob(0);
+       if (!hasCollision(0)) moveMob(0);
 
        /* shooting */
        if (projState == 1) {
@@ -514,7 +514,7 @@ int i, j, k;
 
       /* place player/entities */
       setViewPosition(camera_x, camera_y, camera_z);
-      renderMob(0, 25, 25, 25, NORTH);
+      renderMob(0, 25, 25, 25, WEST);
 
    }
 

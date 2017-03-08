@@ -9,7 +9,7 @@ struct mob {
 };
 
 static int MOB_LIMIT = 10;
-static float MOB_SPEED = 0.1;
+static float MOB_SPEED = 0.05;
 static struct mob MOB[10];
 
 void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o);
