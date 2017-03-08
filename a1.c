@@ -514,8 +514,7 @@ int i, j, k;
 
       /* place player/entities */
       setViewPosition(camera_x, camera_y, camera_z);
-      renderMob(0, 25, 25, 25, EAST);
-      eraseMob(0);
+      renderMob(0, 25, 25, 25, NORTH);
 
    }
 

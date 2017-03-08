@@ -19,6 +19,7 @@ void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o) {
   MOB[mobID].mob_rot = o;
 
   //build center
+  printf("drawing mob at %d %d %d\n", (int)mobX, (int)mobY, (int)mobZ);
   world[(int)mobX][(int)mobY][(int)mobZ] = 8;
 
   /*though the mob's "position" is in terms of floats, the actual positions
@@ -74,8 +75,8 @@ void eraseMob(int mobID) {
     exit(0);
   }
 
-  for (i = MOB[mobID].mob_x - 1; i <= MOB[mobID].mob_x + 1; i++)
-    for (j = MOB[mobID].mob_z - 1; j <= MOB[mobID].mob_z + 1; j++)
+  for (i = MOB[mobID].mob_x - 2; i <= MOB[mobID].mob_x + 1; i++)
+    for (j = MOB[mobID].mob_z - 2; j <= MOB[mobID].mob_z + 1; j++)
       world[i][(int)MOB[mobID].mob_y][j] = 0;
 
   MOB[mobID].mobEnabled = 0;
@@ -127,16 +128,10 @@ void moveMob(int mobID) {
       printf("orientation error detected\n");
       exit(0);
 
-    //visual update
-    eraseMob(mobID);
-    renderMob(mobID, MOB[mobID].mob_x, MOB[mobID].mob_y, MOB[mobID].mob_z, MOB[mobID].mob_rot);
-
   }
 
-}
-
-int hasCollision(int mobID) {
-
-  return 0;
+  //visual update
+  eraseMob(mobID);
+  renderMob(mobID, MOB[mobID].mob_x, MOB[mobID].mob_y, MOB[mobID].mob_z, MOB[mobID].mob_rot);
 
 }
