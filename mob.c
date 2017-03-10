@@ -149,9 +149,8 @@ ORIENTATION selectNewMobOrientation(int mobID) {
   srand(time(NULL));
   do {
     newO = rand() % 4;
-  } while(newO == MOB[mobID].mob_rot);
+  } while(newO == MOB[mobID].mob_rot); //tests if new orientation has a collision conflict
 
-  printf("%d now %d\n", mobID, newO);
   return newO;
 
 }
@@ -171,6 +170,30 @@ void rotateMob(int mobID, ORIENTATION newO) {
 
 }
 
+/*
+  getOldMobPosition(int mobID)
+  stores position of mob[mobID] before it moves.
+*/
+void getOldMobPosition(int mobID) {
+
+  MOB[mobID].old_mob_x = MOB[mobID].mob_x;
+  MOB[mobID].old_mob_y = MOB[mobID].mob_y;
+  MOB[mobID].old_mob_z = MOB[mobID].mob_z;
+
+}
+
+/*
+  goToOldPosition(int mobID)
+  revert current position to a previous state.
+*/
+void goToOldPosition(int mobID) {
+
+  MOB[mobID].mob_x = MOB[mobID].old_mob_x;
+  MOB[mobID].mob_y = MOB[mobID].old_mob_y;
+  MOB[mobID].mob_z = MOB[mobID].old_mob_z;
+
+}
+
 void moveMob(int mobID) {
 
   if (mobID >= MOB_LIMIT) {
@@ -181,6 +204,7 @@ void moveMob(int mobID) {
     exit(0);
   }
 
+  getOldMobPosition(mobID);
   switch (MOB[mobID].mob_rot) {
 
     case NORTH: //UP
@@ -214,6 +238,7 @@ void moveMob(int mobID) {
 */
 int hasCollision(int mobID) {
 
+  printf("%d\n", MOB[mobID].mob_rot);
   switch (MOB[mobID].mob_rot) {
 
     case NORTH: //UP

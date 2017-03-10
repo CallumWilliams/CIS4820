@@ -375,6 +375,8 @@ float *la;
          moveMob(0);
        } else {
          newO = selectNewMobOrientation(0);
+         MOB[0].mob_rot = newO;
+         goToOldPosition(0);
          rotateMob(0, newO);
        }
 
@@ -382,21 +384,9 @@ float *la;
          moveMob(1);
        } else {
          newO = selectNewMobOrientation(1);
+         MOB[1].mob_rot = newO;
+         goToOldPosition(1);
          rotateMob(1, newO);
-       }
-
-       if (!hasCollision(2)) {
-         moveMob(2);
-       } else {
-         newO = selectNewMobOrientation(2);
-         rotateMob(2, newO);
-       }
-
-       if (!hasCollision(3)) {
-         moveMob(3);
-       } else {
-         newO = selectNewMobOrientation(3);
-         rotateMob(3, newO);
        }
 
 
@@ -416,8 +406,7 @@ float *la;
               hideMob(0);
               projState = 0;
               //also delete wall if internal
-              if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 5 ||
-                  world[(int)projX][(int)camera_y*-1][(int)projZ] == 6)
+              if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 5)
                   world[(int)projX][(int)camera_y*-1][(int)projZ] = 0;
            }
 
@@ -548,8 +537,6 @@ int i, j, k;
       initMobs();
       renderMob(0, 25, 25, 25, NORTH);
       renderMob(1, 55, 25, 25, EAST);
-      renderMob(2, 65, 25, 50, SOUTH);
-      renderMob(3, 25, 25, 55, WEST);
 
    }
 

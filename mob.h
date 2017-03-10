@@ -4,6 +4,7 @@ struct mob {
 
   int mobEnabled;
   float mob_x, mob_y, mob_z;
+  float old_mob_x, old_mob_y, old_mob_z;
   ORIENTATION mob_rot;
   int COLOUR_STATE; //0 = yellow, 1 = green;
 
