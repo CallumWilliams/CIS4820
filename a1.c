@@ -35,7 +35,7 @@ static int wallTimer; //wall animation timer
 
 /* projectile global variables */
 static int projState = 0; //0 = not on board, 1 = generate, 2 = moving
-static float x_velocity, z_velocity;
+static float x_velocity, y_velocity, z_velocity;
 static float projX, projZ;
 static float projSpeed = 0.25;
 
@@ -351,6 +351,7 @@ float *la;
 
      /* Assignment Update Code */
      int gameElapsed = glutGet(GLUT_ELAPSED_TIME);
+     ORIENTATION newO;
      //update can occur - execute
      if ((float)(gameElapsed/MILLISECONDS_PER_UPDATE) == (int)(gameElapsed/MILLISECONDS_PER_UPDATE)) {
        timedAnimation();
@@ -368,7 +369,36 @@ float *la;
        }
 
        /* mob movement */
-       if (!hasCollision(0)) moveMob(0);
+       /* had loop problems, temporarily hard coded for testing */
+
+       if (!hasCollision(0)) {
+         moveMob(0);
+       } else {
+         newO = selectNewMobOrientation(0);
+         rotateMob(0, newO);
+       }
+
+       if (!hasCollision(1)) {
+         moveMob(1);
+       } else {
+         newO = selectNewMobOrientation(1);
+         rotateMob(1, newO);
+       }
+
+       if (!hasCollision(2)) {
+         moveMob(2);
+       } else {
+         newO = selectNewMobOrientation(2);
+         rotateMob(2, newO);
+       }
+
+       if (!hasCollision(3)) {
+         moveMob(3);
+       } else {
+         newO = selectNewMobOrientation(3);
+         rotateMob(3, newO);
+       }
+
 
        /* shooting */
        if (projState == 1) {
@@ -418,6 +448,7 @@ void mouse(int button, int state, int x, int y) {
       view_y = (view_y*M_PI)/180;
 
       x_velocity = sin(view_y);
+      y_velocity = sin(view_x);
       z_velocity = -cos(view_y);
 
     }
@@ -483,7 +514,7 @@ int i, j, k;
       /* build ground (same as -testworld) */
       for (i = 0; i < 90; i++) {
          for (j = 0; j < 90; j++) {
-            world[i][24][j] = 1;
+            world[i][24][j] = 6;
          }
       }
 
@@ -514,7 +545,11 @@ int i, j, k;
 
       /* place player/entities */
       setViewPosition(camera_x, camera_y, camera_z);
-      renderMob(0, 25, 25, 25, WEST);
+      initMobs();
+      renderMob(0, 25, 25, 25, NORTH);
+      renderMob(1, 55, 25, 25, EAST);
+      renderMob(2, 65, 25, 50, SOUTH);
+      renderMob(3, 25, 25, 55, WEST);
 
    }
 

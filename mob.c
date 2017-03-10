@@ -1,5 +1,19 @@
+#include <stdlib.h>
+
 #include "mob.h"
 #include "graphics.h"
+
+/*
+  void initMobs()
+  Sets all inital states for mobs (COLOUR_STATE = 0)
+*/
+void initMobs() {
+  int i;
+  for (i = 0; i < MOB_LIMIT; i++) {
+    MOB[i].COLOUR_STATE = 0;
+    MOB[i].mobEnabled = 0;
+  }
+}
 
 void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o) {
 
@@ -9,7 +23,7 @@ void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o) {
   }
 
   if (!checkBox((int)mobX, (int)mobY, (int)mobZ)) {
-    printf("Mob intersecting with terrain - error\n");
+    printf("Mob %d intersecting with terrain - error\n", mobID);
     exit(0);
   }
 
@@ -19,7 +33,10 @@ void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o) {
   MOB[mobID].mob_rot = o;
 
   //build center
-  world[(int)mobX][(int)mobY][(int)mobZ] = 8;
+  if (MOB[mobID].COLOUR_STATE == 0)
+    world[(int)mobX][(int)mobY][(int)mobZ] = 1;
+  else
+    world[(int)mobX][(int)mobY][(int)mobZ] = 8;
 
   /*though the mob's "position" is in terms of floats, the actual positions
   on the grid will be in terms of integers*/
@@ -80,6 +97,19 @@ int checkBox(int x, int y, int z) {
 
 }
 
+void swapColour(int mobID) {
+
+  if (MOB[mobID].COLOUR_STATE == 0) {
+    MOB[mobID].COLOUR_STATE = 1;
+    world[(int)MOB[mobID].mob_x][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z] = 1;
+  } else {
+    MOB[mobID].COLOUR_STATE = 0;
+    world[(int)MOB[mobID].mob_x][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z] = 8;
+  }
+
+
+}
+
 void eraseMob(int mobID) {
 
   int i, j;
@@ -112,6 +142,20 @@ void eraseMob(int mobID) {
 
 }
 
+ORIENTATION selectNewMobOrientation(int mobID) {
+
+  ORIENTATION newO;
+
+  srand(time(NULL));
+  do {
+    newO = rand() % 4;
+  } while(newO == MOB[mobID].mob_rot);
+
+  printf("%d now %d\n", mobID, newO);
+  return newO;
+
+}
+
 void rotateMob(int mobID, ORIENTATION newO) {
 
   int i, j;
@@ -136,7 +180,7 @@ void moveMob(int mobID) {
     printf("Mob %d not enabled\n", mobID);
     exit(0);
   }
-  
+
   switch (MOB[mobID].mob_rot) {
 
     case NORTH: //UP
