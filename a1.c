@@ -368,57 +368,29 @@ float *la;
        /* mob movement */
        /* had loop problems, temporarily hard coded for testing */
        for (i = 0; i < MOB_LIMIT; i++) {
-         if (MOB[i].mobEnabled) printf("test %d\n", i);
-       }
-       /*if (!canSeePlayer(0)) {//continue regular routine
+         if (MOB[i].mobEnabled != 0) {
+           int s = getMobState(i);
+           switch(s) {
 
-         if (!hasCollision(0)) {
-           moveMob(0);
-         } else {
-           newO = selectNewMobOrientation(0);
-           goToOldPosition(0);
-           rotateMob(0, newO);
+             case 0://can't see player
+                if (!hasCollision(i)) moveMob(i);
+                else {//set new rotation
+                   newO = selectNewMobOrientation(i);
+                   goToOldPosition(i);
+                   rotateMob(i, newO);
+                }
+                break;
+             case 1://can see player, player not looking
+                printf("test1\n");
+                break;
+             case 2://can see player, player looking
+                printf("test1\n");
+                break;
+             default:
+                printf("unexpected mob state %d\n", s);
+           }
          }
-
        }
-       swapColour(0);
-
-       if (!canSeePlayer(1)) {//continue regular routine
-
-         if (!hasCollision(1)) {
-           moveMob(1);
-         } else {
-           newO = selectNewMobOrientation(1);
-           goToOldPosition(1);
-           rotateMob(1, newO);
-         }
-
-       }
-
-       if (!canSeePlayer(2)) {//continue regular routine
-
-         if (!hasCollision(2)) {
-           moveMob(2);
-         } else {
-           newO = selectNewMobOrientation(2);
-           goToOldPosition(2);
-           rotateMob(2, newO);
-         }
-
-       }
-
-       if (!canSeePlayer(3)) {//continue regular routine
-
-         if (!hasCollision(3)) {
-           moveMob(3);
-         } else {
-           newO = selectNewMobOrientation(3);
-           goToOldPosition(3);
-           rotateMob(3, newO);
-         }
-
-       }
-
        /* shooting */
        if (projState == 1) {
          setMobPosition(0, camera_x*-1, camera_y*-1, camera_z*-1, view_z);

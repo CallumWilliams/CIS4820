@@ -341,3 +341,22 @@ int canSeePlayer(int mobID) {
   return 1;
 
 }
+
+/*
+  int getMobState(int mobID)
+  Primary decision AI state for each mob
+  State 0: cannot see player
+  State 1: can see player, and player is not aiming at them
+  State 2: can see player, and player is aiming at them
+*/
+int getMobState(int mobID) {
+
+  //State 0: move forward
+  if (!canSeePlayer(mobID)) return 0;
+  else {
+
+    return 1;
+
+  }
+
+}
