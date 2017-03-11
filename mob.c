@@ -25,7 +25,7 @@ void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o) {
     exit(0);
   }
 
-  if (!checkBox((int)mobX, (int)mobY, (int)mobZ)) {
+  if (!checkBox((int)mobX, (int)mobY, (int)mobZ) && MOB[mobID].mobEnabled == 1) {
     printf("Mob %d intersecting with terrain - error\n", mobID);
     exit(0);
   }
@@ -112,6 +112,10 @@ void swapColour(int mobID) {
 
 }
 
+/*
+  void eraseMob(int mobID)
+  removes (not deletes) mob entity from screen
+*/
 void eraseMob(int mobID) {
 
   int i, j;
@@ -119,7 +123,7 @@ void eraseMob(int mobID) {
   if (mobID >= MOB_LIMIT) {
     printf("Mob id cannot exceed %d\n", MOB_LIMIT);
     exit(0);
-  } else if (!MOB[mobID].mobEnabled) {
+  } else if (MOB[mobID].mobEnabled != 1) {
     printf("Mob %d not enabled\n", mobID);
     exit(0);
   }
@@ -148,6 +152,18 @@ void eraseMob(int mobID) {
       break;
   }
 
+}
+
+/*
+  void deleteMob(int mobID)
+  deletes mob entity from game
+*/
+void deleteMob(int mobID) {
+
+  eraseMob(mobID);
+  MOB[mobID].mob_x = 0;
+  MOB[mobID].mob_y = 0;
+  MOB[mobID].mob_z = 0;
   MOB[mobID].mobEnabled = 0;
 
 }
@@ -176,7 +192,7 @@ void rotateMob(int mobID, ORIENTATION newO) {
   if (mobID >= MOB_LIMIT) {
     printf("Mob id cannot exceed %d\n", MOB_LIMIT);
     exit(0);
-  } else if (!MOB[mobID].mobEnabled) {
+  } else if (MOB[mobID].mobEnabled != 1) {
     printf("Mob %d not enabled\n", mobID);
     exit(0);
   }
@@ -209,7 +225,7 @@ void goToOldPosition(int mobID) {
   MOB[mobID].mob_x = MOB[mobID].old_mob_x;
   MOB[mobID].mob_y = MOB[mobID].old_mob_y;
   MOB[mobID].mob_z = MOB[mobID].old_mob_z;
-  renderMob(0, MOB[mobID].mob_x, MOB[mobID].mob_y, MOB[mobID].mob_z, MOB[mobID].mob_rot);
+  renderMob(mobID, MOB[mobID].mob_x, MOB[mobID].mob_y, MOB[mobID].mob_z, MOB[mobID].mob_rot);
 
 }
 
@@ -339,24 +355,5 @@ int canSeePlayer(int mobID) {
   }
 
   return 1;
-
-}
-
-/*
-  int getMobState(int mobID)
-  Primary decision AI state for each mob
-  State 0: cannot see player
-  State 1: can see player, and player is not aiming at them
-  State 2: can see player, and player is aiming at them
-*/
-int getMobState(int mobID) {
-
-  //State 0: move forward
-  if (!canSeePlayer(mobID)) return 0;
-  else {
-
-    return 1;
-
-  }
 
 }

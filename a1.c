@@ -175,15 +175,6 @@ void draw2D() {
                  screenWidth-190+((int)camera_z*-2)+5,
                  screenHeight-190+((int)camera_x*-2)+5);
 
-       // draw mob/projectiles
-       set2Dcolour(red);
-       for (i = 0; i < 9; i++)
-          if (MOB[i].mobEnabled == 1)
-            draw2Dbox(screenWidth-190+((int)MOB[i].mob_z*2),
-                      screenHeight-190+((int)MOB[i].mob_x*2),
-                      screenWidth-190+((int)MOB[i].mob_z*2)+5,
-                      screenHeight-190+((int)MOB[i].mob_x*2)+5);
-
       //projectile in use - draw
       if (projState)
           draw2Dbox(screenWidth-190+((int)projZ*2),
@@ -225,15 +216,6 @@ void draw2D() {
                  (screenHeight/4)+((int)camera_x*-4)+5,
                  (screenWidth/4)+((int)camera_z*-4)+15,
                  (screenHeight/4)+((int)camera_x*-4)+15);
-
-       //draw mobs/projectiles
-       set2Dcolour(red);
-       for (i = 0; i < 9; i++)
-          if (MOB[i].mobEnabled == 1)
-            draw2Dbox((screenWidth/4)+((int)MOB[i].mob_z*4)+5,
-                      (screenHeight/4)+((int)MOB[i].mob_x*4)+5,
-                      (screenWidth/4)+((int)MOB[i].mob_z*4)+15,
-                      (screenHeight/4)+((int)MOB[i].mob_x*4)+15);
 
       //projectile in use - draw
       if (projState)
@@ -369,25 +351,13 @@ float *la;
        /* had loop problems, temporarily hard coded for testing */
        for (i = 0; i < MOB_LIMIT; i++) {
          if (MOB[i].mobEnabled != 0) {
-           int s = getMobState(i);
-           switch(s) {
-
-             case 0://can't see player
-                if (!hasCollision(i)) moveMob(i);
-                else {//set new rotation
-                   newO = selectNewMobOrientation(i);
-                   goToOldPosition(i);
-                   rotateMob(i, newO);
-                }
-                break;
-             case 1://can see player, player not looking
-                printf("test1\n");
-                break;
-             case 2://can see player, player looking
-                printf("test1\n");
-                break;
-             default:
-                printf("unexpected mob state %d\n", s);
+           if (!canSeePlayer(i)) {
+             if (!hasCollision(i)) moveMob(i);
+             else {
+               newO = selectNewMobOrientation(i);
+               goToOldPosition(i);
+               rotateMob(i, newO);
+             }
            }
          }
        }
@@ -537,10 +507,11 @@ int i, j, k;
       setViewPosition(camera_x, camera_y, camera_z);
       initMobs();
       //hard-coded initial positions
-      renderMob(0, 25, 25, 25, NORTH);
+      //renderMob(0, 25, 25, 25, NORTH);
       renderMob(1, 70, 25, 70, SOUTH);
       renderMob(2, 40, 25, 55, WEST);
       renderMob(3, 25, 25, 70, EAST);
+      renderMob(4, 25, 25, 25, EAST);
 
    }
 
