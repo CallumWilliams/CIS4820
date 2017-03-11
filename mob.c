@@ -1,11 +1,14 @@
 #include <stdlib.h>
+#include <math.h>
 
 #include "mob.h"
 #include "graphics.h"
 
+extern float camera_x, camera_y, camera_z;
+
 /*
   void initMobs()
-  Sets all inital states for mobs (COLOUR_STATE = 0)
+  Sets all inital states for mobs
 */
 void initMobs() {
   int i;
@@ -238,7 +241,6 @@ void moveMob(int mobID) {
 */
 int hasCollision(int mobID) {
 
-  printf("%d\n", MOB[mobID].mob_rot);
   switch (MOB[mobID].mob_rot) {
 
     case NORTH: //UP
@@ -280,5 +282,50 @@ int hasCollision(int mobID) {
   }
 
   return 0;
+
+}
+
+/*
+  int canSeePlayer(int mobID)
+  checks if MOB[mobID] can see the player (i.e. no obstacles to them)
+*/
+int canSeePlayer(int mobID) {
+
+  float r;
+  float distX, distY, distZ, distance;
+  int unitVectorX, unitVectorY, unitVectorZ;
+  int i, j, k;
+  GLubyte checkedPosition;
+
+  distX = MOB[mobID].mob_x - (camera_x*-1);
+  distY = MOB[mobID].mob_y - (camera_y*-1);
+  distZ = MOB[mobID].mob_z - (camera_z*-1);
+
+  distance = sqrt(distX*distX + distY*distY + distZ*distZ);
+
+  unitVectorX = (int)roundf(distX/distance);
+  unitVectorY = (int)roundf(distY/distance);
+  unitVectorZ = (int)roundf(distZ/distance);
+
+  for (i = 0 ; i < distance; i++) {
+
+    checkedPosition = getWorldAt((int)(camera_x*-1)+(i*unitVectorX),
+                                 (int)(camera_y*-1)+(i*unitVectorY),
+                                 (int)(camera_z*-1)+(i*unitVectorZ));
+    printf("POS %d %d %d\n", (int)(camera_x*-1), (int)(camera_y*-1), (int)(camera_z*-1));
+    printf("%d %d %d\n", (int)(camera_x*-1)+(i*unitVectorX), (int)(camera_y*-1)+(i*unitVectorY), (int)(camera_z*-1)+(i*unitVectorZ));
+    if (checkedPosition == 0) {
+      //ignore
+    } else if (checkedPosition == 5 || checkedPosition == 6) {
+      printf("wall at %d %d %d\n", (int)(camera_x*-1)+(i*unitVectorX), (int)(camera_y*-1)+(i*unitVectorY), (int)(camera_z*-1)+(i*unitVectorZ));
+      return 0;
+    } else if (checkedPosition == 3) {
+      //printf("mob\n");
+    }
+
+  }
+
+  printf("can see\n");
+  return 1;
 
 }

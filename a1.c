@@ -18,8 +18,8 @@
 #define MILLISECONDS_PER_UPDATE 17 //17*60 = 1020 (or 60 frames/1.02 seconds)
 
   /* global variables for player position */
-static float camera_x = -7, camera_y = -30, camera_z = -7;
-static float view_x, view_y, view_z;
+extern float camera_x = -7, camera_y = -30, camera_z = -7;
+extern float view_x, view_y, view_z;
 
   /* mob variables */
 extern int mobEnabled[];
@@ -368,10 +368,11 @@ float *la;
          setViewPosition(camera_x, camera_y, camera_z);
        }
 
+       canSeePlayer(0);
        /* mob movement */
        /* had loop problems, temporarily hard coded for testing */
 
-       if (!hasCollision(0)) {
+       /*if (!hasCollision(0)) {
          moveMob(0);
        } else {
          newO = selectNewMobOrientation(0);
@@ -389,6 +390,23 @@ float *la;
          rotateMob(1, newO);
        }
 
+       if (!hasCollision(2)) {
+         moveMob(2);
+       } else {
+         newO = selectNewMobOrientation(2);
+         MOB[2].mob_rot = newO;
+         goToOldPosition(2);
+         rotateMob(2, newO);
+       }
+
+       if (!hasCollision(3)) {
+         moveMob(3);
+       } else {
+         newO = selectNewMobOrientation(3);
+         MOB[3].mob_rot = newO;
+         goToOldPosition(3);
+         rotateMob(3, newO);
+       }
 
        /* shooting */
        if (projState == 1) {
@@ -536,8 +554,10 @@ int i, j, k;
       setViewPosition(camera_x, camera_y, camera_z);
       initMobs();
       renderMob(0, 25, 25, 25, NORTH);
-      renderMob(1, 55, 25, 25, EAST);
-
+      /*renderMob(1, 55, 25, 25, EAST);
+      renderMob(2, 55, 25, 55, EAST);
+      renderMob(3, 33, 25, 19, WEST);
+*/
    }
 
 	/* starts the graphics processing loop */
