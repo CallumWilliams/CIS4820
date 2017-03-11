@@ -95,7 +95,6 @@ int checkBox(int x, int y, int z) {
   for (i = x-1; i <= x+1; i++)
     for (j = z-1; j <= z+1; j++)
       if (world[i][y][j] != 0) return 0;
-
   return 1;
 
 }
@@ -128,14 +127,22 @@ void eraseMob(int mobID) {
   switch(MOB[mobID].mob_rot) {
 
     case NORTH:
-    case EAST:
       for (i = (int)MOB[mobID].mob_x - 2; i <= (int)MOB[mobID].mob_x + 1; i++)
+        for (j = (int)MOB[mobID].mob_z - 1; j <= (int)MOB[mobID].mob_z + 1; j++)
+          world[i][(int)MOB[mobID].mob_y][j] = 0;
+      break;
+    case EAST:
+      for (i = (int)MOB[mobID].mob_x - 1; i <= (int)MOB[mobID].mob_x + 1; i++)
         for (j = (int)MOB[mobID].mob_z - 2; j <= (int)MOB[mobID].mob_z + 1; j++)
           world[i][(int)MOB[mobID].mob_y][j] = 0;
       break;
     case SOUTH:
+    for (i = (int)MOB[mobID].mob_x - 1; i <= (int)MOB[mobID].mob_x + 2; i++)
+      for (j = (int)MOB[mobID].mob_z - 1; j <= (int)MOB[mobID].mob_z + 1; j++)
+        world[i][(int)MOB[mobID].mob_y][j] = 0;
+    break;
     case WEST:
-      for (i = (int)MOB[mobID].mob_x - 1; i <= (int)MOB[mobID].mob_x + 2; i++)
+      for (i = (int)MOB[mobID].mob_x - 1; i <= (int)MOB[mobID].mob_x + 1; i++)
         for (j = (int)MOB[mobID].mob_z - 1; j <= (int)MOB[mobID].mob_z + 2; j++)
           world[i][(int)MOB[mobID].mob_y][j] = 0;
       break;
@@ -158,12 +165,19 @@ ORIENTATION selectNewMobOrientation(int mobID) {
 
 }
 
+/*
+  void rotateMob(int mobID, ORIENTATION newO)
+  takes MOB[mobID].mob_rot and sets to newO, and then redraws the mob
+*/
 void rotateMob(int mobID, ORIENTATION newO) {
 
   int i, j;
 
   if (mobID >= MOB_LIMIT) {
     printf("Mob id cannot exceed %d\n", MOB_LIMIT);
+    exit(0);
+  } else if (!MOB[mobID].mobEnabled) {
+    printf("Mob %d not enabled\n", mobID);
     exit(0);
   }
 
@@ -191,9 +205,11 @@ void getOldMobPosition(int mobID) {
 */
 void goToOldPosition(int mobID) {
 
+  eraseMob(mobID);
   MOB[mobID].mob_x = MOB[mobID].old_mob_x;
   MOB[mobID].mob_y = MOB[mobID].old_mob_y;
   MOB[mobID].mob_z = MOB[mobID].old_mob_z;
+  renderMob(0, MOB[mobID].mob_x, MOB[mobID].mob_y, MOB[mobID].mob_z, MOB[mobID].mob_rot);
 
 }
 
@@ -312,20 +328,16 @@ int canSeePlayer(int mobID) {
     checkedPosition = getWorldAt((int)(camera_x*-1)+(i*unitVectorX),
                                  (int)(camera_y*-1)+(i*unitVectorY),
                                  (int)(camera_z*-1)+(i*unitVectorZ));
-    printf("POS %d %d %d\n", (int)(camera_x*-1), (int)(camera_y*-1), (int)(camera_z*-1));
-    printf("%d %d %d\n", (int)(camera_x*-1)+(i*unitVectorX), (int)(camera_y*-1)+(i*unitVectorY), (int)(camera_z*-1)+(i*unitVectorZ));
+
     if (checkedPosition == 0) {
       //ignore
     } else if (checkedPosition == 5 || checkedPosition == 6) {
-      printf("wall at %d %d %d\n", (int)(camera_x*-1)+(i*unitVectorX), (int)(camera_y*-1)+(i*unitVectorY), (int)(camera_z*-1)+(i*unitVectorZ));
+      //wall in the way, return false
       return 0;
-    } else if (checkedPosition == 3) {
-      //printf("mob\n");
     }
 
   }
 
-  printf("can see\n");
   return 1;
 
 }

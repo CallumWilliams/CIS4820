@@ -22,10 +22,7 @@ extern float camera_x = -7, camera_y = -30, camera_z = -7;
 extern float view_x, view_y, view_z;
 
   /* mob variables */
-extern int mobEnabled[];
-extern float mob_x[10];
-extern float mob_y[10];
-extern float mob_z[10];
+extern struct mob MOB[9];
 
   /* global variable for wall locations */
 extern Walls V_Walls[5][6];
@@ -368,44 +365,58 @@ float *la;
          setViewPosition(camera_x, camera_y, camera_z);
        }
 
-       canSeePlayer(0);
        /* mob movement */
        /* had loop problems, temporarily hard coded for testing */
+       for (i = 0; i < MOB_LIMIT; i++) {
+         if (MOB[i].mobEnabled) printf("test %d\n", i);
+       }
+       /*if (!canSeePlayer(0)) {//continue regular routine
 
-       /*if (!hasCollision(0)) {
-         moveMob(0);
-       } else {
-         newO = selectNewMobOrientation(0);
-         MOB[0].mob_rot = newO;
-         goToOldPosition(0);
-         rotateMob(0, newO);
+         if (!hasCollision(0)) {
+           moveMob(0);
+         } else {
+           newO = selectNewMobOrientation(0);
+           goToOldPosition(0);
+           rotateMob(0, newO);
+         }
+
+       }
+       swapColour(0);
+
+       if (!canSeePlayer(1)) {//continue regular routine
+
+         if (!hasCollision(1)) {
+           moveMob(1);
+         } else {
+           newO = selectNewMobOrientation(1);
+           goToOldPosition(1);
+           rotateMob(1, newO);
+         }
+
        }
 
-       if (!hasCollision(1)) {
-         moveMob(1);
-       } else {
-         newO = selectNewMobOrientation(1);
-         MOB[1].mob_rot = newO;
-         goToOldPosition(1);
-         rotateMob(1, newO);
+       if (!canSeePlayer(2)) {//continue regular routine
+
+         if (!hasCollision(2)) {
+           moveMob(2);
+         } else {
+           newO = selectNewMobOrientation(2);
+           goToOldPosition(2);
+           rotateMob(2, newO);
+         }
+
        }
 
-       if (!hasCollision(2)) {
-         moveMob(2);
-       } else {
-         newO = selectNewMobOrientation(2);
-         MOB[2].mob_rot = newO;
-         goToOldPosition(2);
-         rotateMob(2, newO);
-       }
+       if (!canSeePlayer(3)) {//continue regular routine
 
-       if (!hasCollision(3)) {
-         moveMob(3);
-       } else {
-         newO = selectNewMobOrientation(3);
-         MOB[3].mob_rot = newO;
-         goToOldPosition(3);
-         rotateMob(3, newO);
+         if (!hasCollision(3)) {
+           moveMob(3);
+         } else {
+           newO = selectNewMobOrientation(3);
+           goToOldPosition(3);
+           rotateMob(3, newO);
+         }
+
        }
 
        /* shooting */
@@ -553,11 +564,12 @@ int i, j, k;
       /* place player/entities */
       setViewPosition(camera_x, camera_y, camera_z);
       initMobs();
+      //hard-coded initial positions
       renderMob(0, 25, 25, 25, NORTH);
-      /*renderMob(1, 55, 25, 25, EAST);
-      renderMob(2, 55, 25, 55, EAST);
-      renderMob(3, 33, 25, 19, WEST);
-*/
+      renderMob(1, 70, 25, 70, SOUTH);
+      renderMob(2, 40, 25, 55, WEST);
+      renderMob(3, 25, 25, 70, EAST);
+
    }
 
 	/* starts the graphics processing loop */

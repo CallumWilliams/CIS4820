@@ -10,9 +10,9 @@ struct mob {
 
 };
 
-static int MOB_LIMIT = 10;
-static float MOB_SPEED = 0.075;
-static struct mob MOB[10];
+static int MOB_LIMIT = 9; //projectile[9] is reserved for player, [0-8] for mobs
+static float MOB_SPEED = 0.065;
+static struct mob MOB[9];
 
 void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o);
 void swapColour(int mobID);
