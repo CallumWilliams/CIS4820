@@ -372,7 +372,7 @@ int canSeePlayer(int mobID) {
   unitVectorX = distX/distance;
   unitVectorY = distY/distance;
   unitVectorZ = distZ/distance;
-  printf("%d %lf, %lf, %lf\n", mobID, unitVectorX, unitVectorY, unitVectorZ);
+
   for (i = 0 ; i < roundf(distance); i++) {
 
     checkedPosition = getWorldAt((int)((camera_x*-1)+(i*unitVectorX)),
@@ -419,16 +419,33 @@ void shoot(int mobID) {
 
 /*
   int playerCanSee(int mobID)
-  checks whether the player can see MOB[mobID]
+  checks whether the player can see MOB[mobID]. Returns 0 if player
+  cannot see mob. Otherwise, returns 1.
 */
 int playerCanSee(int mobID) {
 
-  float p_x, p_y, p_z;
+  float u_x, u_z;
+  float distX, distZ, distance;
   float x_ang, y_ang, z_ang;
 
-  getViewPosition(&p_x, &p_y, &p_z);
+  float mob_x, mob_z;
+
+  if (!canSeePlayer(mobID)) return 0;
+
   getViewOrientation(&x_ang, &y_ang, &z_ang);
 
+  x_ang = cos((y_ang * M_PI) / 180);
+  z_ang = sin((y_ang * M_PI) / 180);
 
+  distX = (camera_x*-1) - MOB[mobID].mob_x;
+  distZ = (camera_z*-1) - MOB[mobID].mob_z;
+  distance = sqrt(distX*distX + distZ*distZ);
+
+  mob_x = distX/distance;
+  mob_z = distZ/distance;
+
+  if (mob_x*x_ang + mob_z*z_ang <= 45) return 1;
+
+  return 0;
 
 }

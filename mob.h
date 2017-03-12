@@ -10,6 +10,7 @@ struct mob {
   float proj_x, proj_z; //gives position of projectile
   float p_vect_x, p_vect_z; //gives projectile vector
   int COLOUR_STATE; //0 = yellow, 1 = green
+  int turnToggle; //0 = can turn again, 1 = can't turn until not seen
 
 };
 

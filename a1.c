@@ -364,6 +364,15 @@ float *la;
                goToOldPosition(i);
                rotateMob(i, newO);
              }
+             if (playerCanSee(i) && MOB[i].turnToggle == 0) {
+               int new_rot;
+               new_rot = rand() % 2;
+               if (new_rot == 0) turnLeft(i);
+               else turnRight(i);
+               MOB[i].turnToggle = 1;
+             } else if (!playerCanSee(i)){
+               MOB[i].turnToggle = 0;
+             }
            }
          }
        }
