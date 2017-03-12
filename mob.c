@@ -18,6 +18,10 @@ void initMobs() {
   }
 }
 
+/*
+  void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o)
+  sets initial position and draws MOB[mobID]
+*/
 void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o) {
 
   if (mobID >= MOB_LIMIT) {
@@ -99,6 +103,10 @@ int checkBox(int x, int y, int z) {
 
 }
 
+/*
+  void swapColour(int mobID)
+  changes core colour of MOB[mobID]
+*/
 void swapColour(int mobID) {
 
   if (MOB[mobID].COLOUR_STATE == 0) {
@@ -168,6 +176,10 @@ void deleteMob(int mobID) {
 
 }
 
+/*
+  ORIENTATION selectNewMobOrientation(int mobID)
+  randomly selects a new orientation for MOB[mobID]
+*/
 ORIENTATION selectNewMobOrientation(int mobID) {
 
   ORIENTATION newO;
@@ -175,17 +187,25 @@ ORIENTATION selectNewMobOrientation(int mobID) {
   srand(time(NULL));
   do {
     newO = rand() % 4;
-  } while(newO == MOB[mobID].mob_rot); //tests if new orientation has a collision conflict
+  } while(newO == MOB[mobID].mob_rot); //tests if new orientation is new
 
   return newO;
 
 }
 
+/*
+  void turnLeft(int mobID)
+  rotates to the left
+*/
 void turnLeft(int mobID) {
   ORIENTATION n = (MOB[mobID].mob_rot - 1) % 4;
   rotateMob(mobID, n);
 }
 
+/*
+  void turnRight(int mobID)
+  rotates to the right
+*/
 void turnRight(int mobID) {
   ORIENTATION n = (MOB[mobID].mob_rot + 1) % 4;
   rotateMob(mobID, n);
@@ -239,6 +259,10 @@ void goToOldPosition(int mobID) {
 
 }
 
+/*
+  void moveMob(int mobID)
+  modifies position of MOB[mobID] (based on its rotation)
+*/
 void moveMob(int mobID) {
 
   if (mobID >= MOB_LIMIT) {
@@ -367,6 +391,11 @@ int canSeePlayer(int mobID) {
 
 }
 
+/*
+  void shoot(int mobID)
+  initializes bullet for MOB[mobID], getting
+  its initial position and movement vector
+*/
 void shoot(int mobID) {
 
   float distX, distZ, distance;
@@ -384,6 +413,22 @@ void shoot(int mobID) {
   MOB[mobID].p_vect_z = distZ/distance;
 
   MOB[mobID].shoot_state = 1;
+
+
+}
+
+/*
+  int playerCanSee(int mobID)
+  checks whether the player can see MOB[mobID]
+*/
+int playerCanSee(int mobID) {
+
+  float p_x, p_y, p_z;
+  float x_ang, y_ang, z_ang;
+
+  getViewPosition(&p_x, &p_y, &p_z);
+  getViewOrientation(&x_ang, &y_ang, &z_ang);
+
 
 
 }
