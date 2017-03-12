@@ -181,6 +181,16 @@ ORIENTATION selectNewMobOrientation(int mobID) {
 
 }
 
+void turnLeft(int mobID) {
+  ORIENTATION n = (MOB[mobID].mob_rot - 1) % 4;
+  rotateMob(mobID, n);
+}
+
+void turnRight(int mobID) {
+  ORIENTATION n = (MOB[mobID].mob_rot + 1) % 4;
+  rotateMob(mobID, n);
+}
+
 /*
   void rotateMob(int mobID, ORIENTATION newO)
   takes MOB[mobID].mob_rot and sets to newO, and then redraws the mob
@@ -365,10 +375,6 @@ void shoot(int mobID) {
   //calculate projectile vector
   distX = (camera_x*-1) - MOB[mobID].mob_x;
   distZ = (camera_z*-1) - MOB[mobID].mob_z;
-
-  //rotate mob towards player
-  if (distZ > 0) rotateMob(mobID, NORTH);
-  else if (distZ <= 0) rotateMob(mobID, SOUTH);
 
   distance = sqrt(distX*distX + distZ*distZ);
 

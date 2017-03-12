@@ -529,6 +529,7 @@ int i, j, k;
       initMobs();
       //hard-coded initial positions
       renderMob(0, 25, 25, 25, NORTH);
+      turnRight(0);
       renderMob(1, 70, 25, 70, SOUTH);
       renderMob(2, 40, 25, 55, WEST);
       renderMob(3, 25, 25, 70, EAST);

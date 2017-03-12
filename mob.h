@@ -1,4 +1,4 @@
-typedef enum {NORTH, SOUTH, EAST, WEST} ORIENTATION;
+typedef enum {NORTH, EAST, SOUTH, WEST} ORIENTATION;
 
 struct mob {
 
@@ -24,3 +24,4 @@ ORIENTATION selectNewMobOrientation(int mobID);
 void rotateMob(int mobID, ORIENTATION newO);
 int hasCollision(int mobID);
 int canSeePlayer(int mobID);
+void shoot(int mobID);
