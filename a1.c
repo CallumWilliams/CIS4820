@@ -358,23 +358,29 @@ float *la;
              }
            } else {
              if (MOB[i].shoot_state == 0) shoot(i);
+             if (!hasCollision(i)) moveMob(i);
+             else {
+               newO = selectNewMobOrientation(i);
+               goToOldPosition(i);
+               rotateMob(i, newO);
+             }
            }
          }
        }
        /* shooting */
        if (projState == 1) {
-         setMobPosition(0, camera_x*-1, camera_y*-1, camera_z*-1, view_z);
+         setMobPosition(9, camera_x*-1, camera_y*-1, camera_z*-1, view_z);
          projX = camera_x*-1;
          projZ = camera_z*-1;
          projState = 2;
        } else if (projState == 2) {
            projX += x_velocity*projSpeed;
            projZ += z_velocity*projSpeed;
-           setMobPosition(0, projX, camera_y*-1, projZ, 0);
+           setMobPosition(9, projX, camera_y*-1, projZ, 0);
            //if projectile collides with something
            if (world[(int)projX][(int)camera_y*-1][(int)projZ] != 0) {
-              setMobPosition(0, WORLDX, WORLDY, WORLDZ, 0);
-              hideMob(0);
+              setMobPosition(9, WORLDX, WORLDY, WORLDZ, 0);
+              hideMob(9);
               projState = 0;
               //also delete wall if internal
               if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 5)
@@ -391,13 +397,13 @@ float *la;
            //if the projectile is no longer at the core of the mob
            if (MOB[i].mob_x != MOB[i].proj_x || MOB[i].mob_z != MOB[i].proj_z) {
              //if projectile collides with something (besides a red space)
-             if (world[(int)projX][(int)camera_y*-1][(int)projZ] != 0 && world[(int)projX][(int)camera_y*-1][(int)projZ] != 3) {
+             if (world[(int)MOB[i].proj_x][(int)MOB[i].mob_y][(int)MOB[i].proj_z] != 0 && world[(int)projX][(int)camera_y*-1][(int)projZ] != 3) {
                 setMobPosition(0, WORLDX, WORLDY, WORLDZ, 0);
                 hideMob(0);
-                projState = 0;
+                MOB[i].shoot_state = 0;
                 //also delete wall if internal
-                if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 5)
-                    world[(int)projX][(int)camera_y*-1][(int)projZ] = 0;
+                if (world[(int)MOB[i].proj_x][(int)MOB[i].mob_y][(int)MOB[i].proj_z] == 5)
+                    world[(int)MOB[i].proj_x][(int)MOB[i].mob_y][(int)MOB[i].proj_z] = 0;
              }
            }
          }
@@ -418,7 +424,7 @@ void mouse(int button, int state, int x, int y) {
 
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && projState == 0) {
       projState = 1;
-      createMob(0, camera_x*-1, camera_y*-1, camera_z*-1, 0);
+      createMob(9, camera_x*-1, camera_y*-1, camera_z*-1, 0);
       getViewOrientation(&view_x, &view_y, &view_z);
       /* temporary angle normalizer (float mod integer didn't work) */
       while (view_x >= 360) view_x -= 360;
