@@ -6,6 +6,9 @@ struct mob {
   float mob_x, mob_y, mob_z;
   float old_mob_x, old_mob_y, old_mob_z;
   ORIENTATION mob_rot;
+  int shoot_state; //0 = not shooting, 1 = bullet moving
+  float proj_x, proj_z; //gives position of projectile
+  float p_vect_x, p_vect_z; //gives projectile vector
   int COLOUR_STATE; //0 = yellow, 1 = green
 
 };

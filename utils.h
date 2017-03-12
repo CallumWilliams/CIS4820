@@ -2,6 +2,8 @@
 #include "walls.h"
 #include "mob.h"
 
+#define M_PI 3.14159265358979323846
+
 float camera_x, camera_y, camera_z;
 float view_x, view_y, view_z;
 

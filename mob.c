@@ -325,7 +325,7 @@ int canSeePlayer(int mobID) {
 
   float r;
   float distX, distY, distZ, distance;
-  int unitVectorX, unitVectorY, unitVectorZ;
+  float unitVectorX, unitVectorY, unitVectorZ;
   int i, j, k;
   GLubyte checkedPosition;
 
@@ -335,25 +335,49 @@ int canSeePlayer(int mobID) {
 
   distance = sqrt(distX*distX + distY*distY + distZ*distZ);
 
-  unitVectorX = (int)roundf(distX/distance);
-  unitVectorY = (int)roundf(distY/distance);
-  unitVectorZ = (int)roundf(distZ/distance);
+  unitVectorX = distX/distance;
+  unitVectorY = distY/distance;
+  unitVectorZ = distZ/distance;
+  printf("%d %lf, %lf, %lf\n", mobID, unitVectorX, unitVectorY, unitVectorZ);
+  for (i = 0 ; i < roundf(distance); i++) {
 
-  for (i = 0 ; i < distance; i++) {
-
-    checkedPosition = getWorldAt((int)(camera_x*-1)+(i*unitVectorX),
-                                 (int)(camera_y*-1)+(i*unitVectorY),
-                                 (int)(camera_z*-1)+(i*unitVectorZ));
+    checkedPosition = getWorldAt((int)((camera_x*-1)+(i*unitVectorX)),
+                                 (int)((camera_y*-1)+(i*unitVectorY)),
+                                 (int)((camera_z*-1)+(i*unitVectorZ)));
 
     if (checkedPosition == 0) {
       //ignore
     } else if (checkedPosition == 5 || checkedPosition == 6) {
-      //wall in the way, return false
       return 0;
     }
 
   }
 
   return 1;
+
+}
+
+void shoot(int mobID) {
+
+  float distX, distZ, distance;
+
+  createMob(mobID, MOB[mobID].mob_x, MOB[mobID].mob_y, MOB[mobID].mob_z, 0);
+  //calculate projectile vector
+  distX = (camera_x*-1) - MOB[mobID].mob_x;
+  distZ = (camera_z*-1) - MOB[mobID].mob_z;
+
+  //rotate mob towards player
+  if (distZ > 0) rotateMob(mobID, NORTH);
+  else if (distZ <= 0) rotateMob(mobID, SOUTH);
+
+  distance = sqrt(distX*distX + distZ*distZ);
+
+  MOB[mobID].proj_x = MOB[mobID].mob_x;
+  MOB[mobID].proj_z = MOB[mobID].mob_z;
+  MOB[mobID].p_vect_x = distX/distance;
+  MOB[mobID].p_vect_z = distZ/distance;
+
+  MOB[mobID].shoot_state = 1;
+
 
 }

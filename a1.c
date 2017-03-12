@@ -14,7 +14,6 @@
 #include "graphics.h"
 #include "utils.h"
 
-#define M_PI 3.14159265358979323846
 #define MILLISECONDS_PER_UPDATE 17 //17*60 = 1020 (or 60 frames/1.02 seconds)
 
   /* global variables for player position */
@@ -34,7 +33,7 @@ static int wallTimer; //wall animation timer
 static int projState = 0; //0 = not on board, 1 = generate, 2 = moving
 static float x_velocity, y_velocity, z_velocity;
 static float projX, projZ;
-static float projSpeed = 0.25;
+static float projSpeed = 0.4;
 
 	/* mouse function called by GLUT when a button is pressed or released */
 void mouse(int, int, int, int);
@@ -348,7 +347,6 @@ float *la;
        }
 
        /* mob movement */
-       /* had loop problems, temporarily hard coded for testing */
        for (i = 0; i < MOB_LIMIT; i++) {
          if (MOB[i].mobEnabled != 0) {
            if (!canSeePlayer(i)) {
@@ -358,6 +356,8 @@ float *la;
                goToOldPosition(i);
                rotateMob(i, newO);
              }
+           } else {
+             if (MOB[i].shoot_state == 0) shoot(i);
            }
          }
        }
@@ -380,6 +380,27 @@ float *la;
               if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 5)
                   world[(int)projX][(int)camera_y*-1][(int)projZ] = 0;
            }
+
+       }
+       for (i = 0; i < MOB_LIMIT; i++) {
+
+         if (MOB[i].shoot_state == 1) {
+           MOB[i].proj_x += MOB[i].p_vect_x*projSpeed;
+           MOB[i].proj_z += MOB[i].p_vect_z*projSpeed;
+           setMobPosition(i, MOB[i].proj_x, MOB[i].mob_y, MOB[i].proj_z, 0);
+           //if the projectile is no longer at the core of the mob
+           if (MOB[i].mob_x != MOB[i].proj_x || MOB[i].mob_z != MOB[i].proj_z) {
+             //if projectile collides with something (besides a red space)
+             if (world[(int)projX][(int)camera_y*-1][(int)projZ] != 0 && world[(int)projX][(int)camera_y*-1][(int)projZ] != 3) {
+                setMobPosition(0, WORLDX, WORLDY, WORLDZ, 0);
+                hideMob(0);
+                projState = 0;
+                //also delete wall if internal
+                if (world[(int)projX][(int)camera_y*-1][(int)projZ] == 5)
+                    world[(int)projX][(int)camera_y*-1][(int)projZ] = 0;
+             }
+           }
+         }
 
        }
 
@@ -507,11 +528,10 @@ int i, j, k;
       setViewPosition(camera_x, camera_y, camera_z);
       initMobs();
       //hard-coded initial positions
-      //renderMob(0, 25, 25, 25, NORTH);
+      renderMob(0, 25, 25, 25, NORTH);
       renderMob(1, 70, 25, 70, SOUTH);
       renderMob(2, 40, 25, 55, WEST);
       renderMob(3, 25, 25, 70, EAST);
-      renderMob(4, 25, 25, 25, EAST);
 
    }
 
