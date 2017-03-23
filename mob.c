@@ -50,32 +50,32 @@ void renderMob(int mobID, float mobX, float mobY, float mobZ, ORIENTATION o) {
 
   switch(o) {
     case NORTH:
-      world[(int)mobX+1][(int)mobY][(int)mobZ] = 3; //head
-      world[(int)mobX][(int)mobY][(int)mobZ-1] = 3;
-      world[(int)mobX][(int)mobY][(int)mobZ+1] = 3;
-      world[(int)mobX-1][(int)mobY][(int)mobZ-1] = 3;
-      world[(int)mobX-1][(int)mobY][(int)mobZ+1] = 3;
+      world[(int)mobX+1][(int)mobY][(int)mobZ] = 8; //head
+      world[(int)mobX][(int)mobY][(int)mobZ-1] = 8;
+      world[(int)mobX][(int)mobY][(int)mobZ+1] = 8;
+      world[(int)mobX-1][(int)mobY][(int)mobZ-1] = 8;
+      world[(int)mobX-1][(int)mobY][(int)mobZ+1] = 8;
       break;
     case EAST:
-      world[(int)mobX][(int)mobY][(int)mobZ+1] = 3; //head
-      world[(int)mobX-1][(int)mobY][(int)mobZ] = 3;
-      world[(int)mobX+1][(int)mobY][(int)mobZ] = 3;
-      world[(int)mobX-1][(int)mobY][(int)mobZ-1] = 3;
-      world[(int)mobX+1][(int)mobY][(int)mobZ-1] = 3;
+      world[(int)mobX][(int)mobY][(int)mobZ+1] = 8; //head
+      world[(int)mobX-1][(int)mobY][(int)mobZ] = 8;
+      world[(int)mobX+1][(int)mobY][(int)mobZ] = 8;
+      world[(int)mobX-1][(int)mobY][(int)mobZ-1] = 8;
+      world[(int)mobX+1][(int)mobY][(int)mobZ-1] = 8;
       break;
     case SOUTH:
-      world[(int)mobX-1][(int)mobY][(int)mobZ] = 3; //head
-      world[(int)mobX][(int)mobY][(int)mobZ+1] = 3;
-      world[(int)mobX][(int)mobY][(int)mobZ-1] = 3;
-      world[(int)mobX+1][(int)mobY][(int)mobZ+1] = 3;
-      world[(int)mobX+1][(int)mobY][(int)mobZ-1] = 3;
+      world[(int)mobX-1][(int)mobY][(int)mobZ] = 8; //head
+      world[(int)mobX][(int)mobY][(int)mobZ+1] = 8;
+      world[(int)mobX][(int)mobY][(int)mobZ-1] = 8;
+      world[(int)mobX+1][(int)mobY][(int)mobZ+1] = 8;
+      world[(int)mobX+1][(int)mobY][(int)mobZ-1] = 8;
       break;
     case WEST:
-      world[(int)mobX][(int)mobY][(int)mobZ-1] = 3; //head
-      world[(int)mobX-1][(int)mobY][(int)mobZ] = 3;
-      world[(int)mobX+1][(int)mobY][(int)mobZ] = 3;
-      world[(int)mobX-1][(int)mobY][(int)mobZ+1] = 3;
-      world[(int)mobX+1][(int)mobY][(int)mobZ+1] = 3;
+      world[(int)mobX][(int)mobY][(int)mobZ-1] = 8; //head
+      world[(int)mobX-1][(int)mobY][(int)mobZ] = 8;
+      world[(int)mobX+1][(int)mobY][(int)mobZ] = 8;
+      world[(int)mobX-1][(int)mobY][(int)mobZ+1] = 8;
+      world[(int)mobX+1][(int)mobY][(int)mobZ+1] = 8;
       break;
     default://fail-safe
       printf("mob render error\n");

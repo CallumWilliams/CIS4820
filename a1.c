@@ -23,6 +23,7 @@ extern int KEY_COLLECTED = 0;
 
   /* item variables */
 extern struct item ITEM_ARRAY[7];
+int doorStart = 5; int doorEnd = 10;
 
   /* mob variables */
 extern struct mob MOB[9];
@@ -217,11 +218,12 @@ void draw2D() {
                     screenWidth-190+((int)projZ*2)+5,
                     screenHeight-190+((int)projX*2)+5);
 
-      set2Dcolour(red);
       for (i = 0; i < 7; i++) {
         if (ITEM_ARRAY[i].enabled)
           if (i == 0) set2Dcolour(white);
-          else set2Dcolour(red);
+          else if (i == 1 || i == 2) set2Dcolour(red);
+          else if (i == 3 || i == 4) set2Dcolour(blue);
+          else set2Dcolour(black);
 
           draw2Dbox(screenWidth-190+ITEM_ARRAY[i].pos_z*2,
                     screenHeight-190+ITEM_ARRAY[i].pos_x*2,
@@ -271,6 +273,20 @@ void draw2D() {
                     (screenHeight/4)+((int)projX*4)+5,
                     (screenWidth/4)+((int)projZ*4)+15,
                     (screenHeight/4)+((int)projX*4)+15);
+
+      for (i = 0; i < 7; i++) {
+        if (ITEM_ARRAY[i].enabled)
+          if (i == 0) set2Dcolour(white);
+          else if (i == 1 || i == 2) set2Dcolour(red);
+          else if (i == 3 || i == 4) set2Dcolour(blue);
+          else set2Dcolour(black);
+
+          draw2Dbox((screenWidth/4)+ITEM_ARRAY[i].pos_z*2+5,
+                    (screenHeight/4)+ITEM_ARRAY[i].pos_x*2+5,
+                    (screenWidth/4)+(ITEM_ARRAY[i].pos_z*2)+15,
+                    (screenHeight/4)+(ITEM_ARRAY[i].pos_x*2)+15);
+
+      }
 
        for (i = 0; i < 90; i++) {
 
@@ -463,6 +479,15 @@ float *la;
                 if (world[(int)MOB[i].proj_x][(int)MOB[i].mob_y][(int)MOB[i].proj_z] == 5)
                     world[(int)MOB[i].proj_x][(int)MOB[i].mob_y][(int)MOB[i].proj_z] = 0;
              }
+             // round variables, for more general accuracy
+             float rndProjX, rndProjZ, rndPlayerX, rndPlayerZ;
+             rndProjX = roundf(MOB[i].proj_x);
+             rndProjZ = roundf(MOB[i].proj_z);
+             rndPlayerX = roundf(camera_x*-1);
+             rndPlayerZ = roundf(camera_z*-1);
+             if (rndProjX == rndPlayerX && rndProjZ == rndPlayerZ) {
+               printf("Player hit by enemy projectile\n");
+             }
            }
          }
 
@@ -586,6 +611,13 @@ int i, j, k;
             world[0][j][i] = 6;
             world[89][j][i] = 6;
          }
+      }
+
+      /* exit door */
+      for (i = 5; i < 10; i++) {
+        for (j = 25; j < 30; j++) {
+          world[i][j][89] = 8;
+        }
       }
 
       /* place player/entities */
