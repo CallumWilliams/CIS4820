@@ -1,7 +1,7 @@
 INCLUDES = -w -F/System/Library/Frameworks -framework OpenGL -framework GLUT -lm
 
-a3: a1.c utils.h item mob wall graphic visible
-	gcc a1.c *.o -o a3 $(INCLUDES)
+a4: a1.c utils.h item mob wall graphic visible
+	gcc a1.c *.o -o a4 $(INCLUDES)
 	rm *.o
 
 item: item.c item.h graphics.h
@@ -20,4 +20,4 @@ visible: visible.c graphics.h
 	gcc -c visible.c -o visible.o $(INCLUDES)
 
 clean:
-	rm a3
+	rm a4

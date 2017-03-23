@@ -4,12 +4,20 @@
 #include "item.h"
 #include "graphics.h"
 
+void initItems() {
+  int i;
+  for (i = 0; i < 7; i++) {
+    ITEM_ARRAY[i].enabled = 0;
+  }
+}
+
 void generateObject(int OBJ_ID, OBJECT_TYPE t, int x, int y, int z) {
 
   ITEM_ARRAY[OBJ_ID].pos_x = x;
   ITEM_ARRAY[OBJ_ID].pos_y = y;
   ITEM_ARRAY[OBJ_ID].pos_z = z;
   ITEM_ARRAY[OBJ_ID].ot = t;
+  ITEM_ARRAY[OBJ_ID].enabled = 1;
 
   switch (t) {
     case KEY:
@@ -38,6 +46,7 @@ void removeObject(int OBJ_ID) {
   x = ITEM_ARRAY[OBJ_ID].pos_x;
   y = ITEM_ARRAY[OBJ_ID].pos_y;
   z = ITEM_ARRAY[OBJ_ID].pos_z;
+  ITEM_ARRAY[OBJ_ID].enabled = 0;
 
   world[x][y][z] = 0;
 

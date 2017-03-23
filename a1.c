@@ -185,6 +185,16 @@ void draw2D() {
                     screenWidth-190+((int)projZ*2)+5,
                     screenHeight-190+((int)projX*2)+5);
 
+      //items on map
+      set2Dcolour(red);
+      for (i = 0; i < 7; i++) {
+        if (ITEM_ARRAY[i].enabled)
+          draw2Dbox(screenWidth-190+ITEM_ARRAY[i].pos_z*2,
+                    screenHeight-190+ITEM_ARRAY[i].pos_x*2,
+                    screenWidth-190+(ITEM_ARRAY[i].pos_z*2)+3,
+                    screenHeight-190+(ITEM_ARRAY[i].pos_x*2)+3);
+      }
+
        for (i = 0; i < 90; i++) {
 
          for (j = 0; j < 90; j++) {
