@@ -19,6 +19,10 @@
   /* global variables for player position */
 extern float camera_x = -7, camera_y = -30, camera_z = -7;
 extern float view_x, view_y, view_z;
+extern int KEY_COLLECTED = 0;
+
+  /* item variables */
+extern struct item ITEM_ARRAY[7];
 
   /* mob variables */
 extern struct mob MOB[9];
@@ -29,7 +33,7 @@ extern Walls H_Walls[6][5];
 extern int wallToggle;
 static int wallTimer; //wall animation timer
 
-/* projectile global variables */
+  /* projectile global variables */
 static int projState = 0; //0 = not on board, 1 = generate, 2 = moving
 static float x_velocity, y_velocity, z_velocity;
 static float projX, projZ;
@@ -544,10 +548,35 @@ int i, j, k;
       initMobs();
       //hard-coded initial positions
       renderMob(0, 25, 25, 25, NORTH);
-      turnRight(0);
       renderMob(1, 70, 25, 70, SOUTH);
       renderMob(2, 40, 25, 55, WEST);
       renderMob(3, 25, 25, 70, EAST);
+
+      //object generation (random)
+      int itemX, itemZ;
+      for (i = 0; i < 7; i++) {
+        generatePosition(&itemX, &itemZ);
+        switch (i) {
+          case 0:
+            generateObject(i, KEY, itemX, 25, itemZ);
+            break;
+          case 1:
+          case 2:
+            generateObject(i, TELEPORT, itemX, 25, itemZ);
+            break;
+          case 3:
+          case 4:
+            generateObject(i, BOUNCE, itemX, 25, itemZ);
+            break;
+          case 5:
+          case 6:
+            generateObject(i, FALL_CUBE, itemX, 25, itemZ);
+            break;
+          default:
+            printf("Unexpected item generation ID %d\n", i);
+            exit(0);
+        }
+      }
 
    }
 

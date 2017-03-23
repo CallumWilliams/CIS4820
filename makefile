@@ -1,6 +1,6 @@
 INCLUDES = -w -F/System/Library/Frameworks -framework OpenGL -framework GLUT -lm
 
-a3: a1.c utils.h mob wall graphic visible
+a3: a1.c utils.h item mob wall graphic visible
 	gcc a1.c *.o -o a3 $(INCLUDES)
 	rm *.o
 
