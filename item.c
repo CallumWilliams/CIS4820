@@ -51,3 +51,21 @@ void removeObject(int OBJ_ID) {
   world[x][y][z] = 0;
 
 }
+
+int playerObjectCollide(float p_x, float p_y, float p_z) {
+
+  int i;
+  for (i = 0; i < 7; i++) {
+    if ((int)p_x*-1 == ITEM_ARRAY[i].pos_x &&
+        (int)p_y*-1 == ITEM_ARRAY[i].pos_y &&
+        (int)p_z*-1 == ITEM_ARRAY[i].pos_z &&
+        ITEM_ARRAY[i].enabled) {
+          printf("collision with object %d\n", i);
+          removeObject(i);
+          return (int)ITEM_ARRAY[i].ot;
+        }
+  }
+
+  return -1;
+
+}

@@ -114,9 +114,41 @@ extern void tree(float, float, float, float, float, float, int);
 void collisionResponse() {
 
   static float oldX, oldY, oldZ;
+  int i;
+  int item_col;
 
   getOldViewPosition(&oldX, &oldY, &oldZ);
   getViewPosition(&camera_x, &camera_y, &camera_z);
+
+  item_col = playerObjectCollide(camera_x, camera_y, camera_z);
+
+  switch (item_col) {
+    case 0:
+      printf("Collected item - KEY\n");
+      KEY_COLLECTED = 1;
+      break;
+    case 1:
+      printf("Collected item - TELEPORT\n");
+      for (i = 0; i < MOB_LIMIT; i++) {
+        if (MOB[i].mobEnabled != 0) {
+          int newx, newz; //vars for new positions
+          genRandomMobPosition(&newx, &newz);
+          eraseMob(i);
+          renderMob(i, newx, 25, newz, MOB[i].mob_rot);
+        }
+      }
+      break;
+    case 2:
+      printf("Collected item - BOUNCE\n");
+
+      break;
+    case 3:
+      printf("Collected item - FALL_CUBE\n");
+      //FALL_CUBE CODE
+      break;
+    default:
+      ;//no collision detected - move on
+  }
 
   //collision detection
   if (world[(int)(((camera_x)*-1))][(int)(((camera_y)*-1))][(int)(((camera_z)*-1))] != 0) {
@@ -185,14 +217,17 @@ void draw2D() {
                     screenWidth-190+((int)projZ*2)+5,
                     screenHeight-190+((int)projX*2)+5);
 
-      //items on map
       set2Dcolour(red);
       for (i = 0; i < 7; i++) {
         if (ITEM_ARRAY[i].enabled)
+          if (i == 0) set2Dcolour(white);
+          else set2Dcolour(red);
+
           draw2Dbox(screenWidth-190+ITEM_ARRAY[i].pos_z*2,
                     screenHeight-190+ITEM_ARRAY[i].pos_x*2,
-                    screenWidth-190+(ITEM_ARRAY[i].pos_z*2)+3,
-                    screenHeight-190+(ITEM_ARRAY[i].pos_x*2)+3);
+                    screenWidth-190+(ITEM_ARRAY[i].pos_z*2)+5,
+                    screenHeight-190+(ITEM_ARRAY[i].pos_x*2)+5);
+
       }
 
        for (i = 0; i < 90; i++) {

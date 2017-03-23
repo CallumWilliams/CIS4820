@@ -103,6 +103,22 @@ int checkBox(int x, int y, int z) {
 
 }
 
+void genRandomMobPosition(int *x, int *z) {
+
+  int randX, randZ;
+
+  randX = rand() % 90;
+  randZ = rand() % 90;
+  while (!checkBox(randX, 25, randZ)) {
+    randX = rand() % 90;
+    randZ = rand() % 90;
+  }
+
+  *x = randX;
+  *z = randZ;
+
+}
+
 /*
   void swapColour(int mobID)
   changes core colour of MOB[mobID]
