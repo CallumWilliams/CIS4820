@@ -31,7 +31,7 @@ extern struct mob MOB[9];
   /* global variable for wall locations */
 extern Walls V_Walls[5][6];
 extern Walls H_Walls[6][5];
-extern int wallToggle;
+//extern int wallToggle;
 static int wallTimer; //wall animation timer
 
   /* projectile global variables */
@@ -121,6 +121,15 @@ void collisionResponse() {
   getOldViewPosition(&oldX, &oldY, &oldZ);
   getViewPosition(&camera_x, &camera_y, &camera_z);
 
+  //check if collision is with door
+  if ((int)camera_z*-1 == 89 && (int)camera_x*-1 >= doorStart && (int)camera_x*-1 <= doorEnd && KEY_COLLECTED) {
+    printf("Level complete! Resetting...\n");
+    WORLDRESET();
+    camera_x = -7; camera_y = -30; camera_z = -7;
+    setViewPosition(camera_x, camera_y, camera_z);
+    KEY_COLLECTED = 0;
+  }
+
   item_col = playerObjectCollide(camera_x, camera_y, camera_z);
 
   switch (item_col) {
@@ -141,29 +150,31 @@ void collisionResponse() {
       break;
     case 2:
       printf("Collected item - BOUNCE\n");
-
+      int newx, newz;
+      generatePosition(&newx, &newz);
+      camera_x = newx*-1;
+      camera_y = -45;
+      camera_z = newz*-1;
       break;
     case 3:
       printf("Collected item - FALL_CUBE\n");
       //FALL_CUBE CODE
       break;
     default:
-      ;//no collision detected - move on
+      //collision detection
+      if (world[(int)(((camera_x)*-1))][(int)(((camera_y)*-1))][(int)(((camera_z)*-1))] != 0) {
+        //climbing detection - checks the spot directly above current collided block
+        if (world[(int)(((camera_x)*-1))][(int)(((camera_y)*-1)+1)][(int)(((camera_z)*-1))] == 0) {
+          camera_y -= 1;
+        } else {
+          camera_x = oldX; camera_y = oldY; camera_z = oldZ;
+        }
+
+      //out of bounds
+      } else if (((camera_x)*-1 > WORLDX) || ((camera_x)*-1 < 0) || ((camera_y)*-1 > WORLDY) || ((camera_y)*-1 < 0) || ((camera_z)*-1 > WORLDZ) || ((camera_z)*-1 < 0)) {
+        camera_x = oldX; camera_y = oldY; camera_z = oldZ;
+      }
   }
-
-  //collision detection
-  if (world[(int)(((camera_x)*-1))][(int)(((camera_y)*-1))][(int)(((camera_z)*-1))] != 0) {
-    //climbing detection - checks the spot directly above current collided block
-    if (world[(int)(((camera_x)*-1))][(int)(((camera_y)*-1)+1)][(int)(((camera_z)*-1))] == 0) {
-      camera_y -= 1;
-    } else {
-      camera_x = oldX; camera_y = oldY; camera_z = oldZ;
-    }
-
-  //out of bounds
-  } else if (((camera_x)*-1 > WORLDX) || ((camera_x)*-1 < 0) || ((camera_y)*-1 > WORLDY) || ((camera_y)*-1 < 0) || ((camera_z)*-1 > WORLDZ) || ((camera_z)*-1 < 0)) {
-    camera_x = oldX; camera_y = oldY; camera_z = oldZ;
-}
 
   setViewPosition(camera_x, camera_y, camera_z);
 
@@ -472,8 +483,8 @@ float *la;
            if (MOB[i].mob_x != MOB[i].proj_x || MOB[i].mob_z != MOB[i].proj_z) {
              //if projectile collides with something (besides a red space)
              if (world[(int)MOB[i].proj_x][(int)MOB[i].mob_y][(int)MOB[i].proj_z] != 0 && world[(int)projX][(int)camera_y*-1][(int)projZ] != 3) {
-                setMobPosition(0, WORLDX, WORLDY, WORLDZ, 0);
-                hideMob(0);
+                setMobPosition(i, WORLDX, WORLDY, WORLDZ, 0);
+                hideMob(i);
                 MOB[i].shoot_state = 0;
                 //also delete wall if internal
                 if (world[(int)MOB[i].proj_x][(int)MOB[i].mob_y][(int)MOB[i].proj_z] == 5)
@@ -487,6 +498,9 @@ float *la;
              rndPlayerZ = roundf(camera_z*-1);
              if (rndProjX == rndPlayerX && rndProjZ == rndPlayerZ) {
                printf("Player hit by enemy projectile\n");
+               setMobPosition(i, WORLDX, WORLDY, WORLDZ, 0);
+               hideMob(i);
+               MOB[i].shoot_state = 0;
              }
            }
          }
@@ -580,81 +594,8 @@ int i, j, k;
    } else {
 
       /* Assignment Code */
-
-      /* build ground (same as -testworld) */
-      for (i = 0; i < 90; i++) {
-         for (j = 0; j < 90; j++) {
-            world[i][24][j] = 6;
-         }
-      }
-
-      /* build pillars */
-      for (i = 1; i < 6; i++) {
-         for (j = 1; j < 6; j++) {
-            for (k = 25; k < 30; k++) {
-               world[i*15][k][j*15] = 6;
-            }
-         }
-      }
-
-      generateWalls();
-
-      /* boundary box */
-      for (i = 0; i < 90-1; i++) {
-         for (j = 25; j < 30; j++) {
-            world[i][j][0] = 6;
-            world[i][j][89] = 6;
-         }
-      }
-      for (i = 0; i < 90; i++) {
-         for (j = 25; j < 30; j++) {
-            world[0][j][i] = 6;
-            world[89][j][i] = 6;
-         }
-      }
-
-      /* exit door */
-      for (i = 5; i < 10; i++) {
-        for (j = 25; j < 30; j++) {
-          world[i][j][89] = 8;
-        }
-      }
-
-      /* place player/entities */
+      WORLDDRAW();
       setViewPosition(camera_x, camera_y, camera_z);
-      initMobs();
-      //hard-coded initial positions
-      renderMob(0, 25, 25, 25, NORTH);
-      renderMob(1, 70, 25, 70, SOUTH);
-      renderMob(2, 40, 25, 55, WEST);
-      renderMob(3, 25, 25, 70, EAST);
-
-      //object generation (random)
-      int itemX, itemZ;
-      for (i = 0; i < 7; i++) {
-        generatePosition(&itemX, &itemZ);
-        switch (i) {
-          case 0:
-            generateObject(i, KEY, itemX, 25, itemZ);
-            break;
-          case 1:
-          case 2:
-            generateObject(i, TELEPORT, itemX, 25, itemZ);
-            break;
-          case 3:
-          case 4:
-            generateObject(i, BOUNCE, itemX, 25, itemZ);
-            break;
-          case 5:
-          case 6:
-            generateObject(i, FALL_CUBE, itemX, 25, itemZ);
-            break;
-          default:
-            printf("Unexpected item generation ID %d\n", i);
-            exit(0);
-        }
-      }
-
    }
 
 	/* starts the graphics processing loop */

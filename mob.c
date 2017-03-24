@@ -328,33 +328,33 @@ int hasCollision(int mobID) {
     case NORTH: //UP
       if (world[(int)MOB[mobID].mob_x+2][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z] != 0)
         return 1;
-      else if (world[(int)MOB[mobID].mob_x+1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+1] != 0)
+      else if (world[(int)MOB[mobID].mob_x+2][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+1] != 0)
         return 1;
-      else if (world[(int)MOB[mobID].mob_x+1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-1] != 0)
+      else if (world[(int)MOB[mobID].mob_x+2][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-1] != 0)
         return 1;
       break;
     case EAST: //RIGHT
       if (world[(int)MOB[mobID].mob_x][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+2] != 0)
         return 1;
-      else if (world[(int)MOB[mobID].mob_x+1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+1] != 0)
+      else if (world[(int)MOB[mobID].mob_x+1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+2] != 0)
         return 1;
-      else if (world[(int)MOB[mobID].mob_x-1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+1] != 0)
+      else if (world[(int)MOB[mobID].mob_x-1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+2] != 0)
         return 1;
       break;
     case SOUTH: //DOWN
       if (world[(int)MOB[mobID].mob_x-2][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z] != 0)
         return 1;
-      else if (world[(int)MOB[mobID].mob_x-1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+1] != 0)
+      else if (world[(int)MOB[mobID].mob_x-2][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z+1] != 0)
         return 1;
-      else if (world[(int)MOB[mobID].mob_x-1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-1] != 0)
+      else if (world[(int)MOB[mobID].mob_x-2][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-1] != 0)
         return 1;
       break;
     case WEST: //LEFT
       if (world[(int)MOB[mobID].mob_x][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-2] != 0)
         return 1;
-      else if (world[(int)MOB[mobID].mob_x+1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-1] != 0)
+      else if (world[(int)MOB[mobID].mob_x+1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-2] != 0)
         return 1;
-      else if (world[(int)MOB[mobID].mob_x-1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-1] != 0)
+      else if (world[(int)MOB[mobID].mob_x-1][(int)MOB[mobID].mob_y][(int)MOB[mobID].mob_z-2] != 0)
         return 1;
       break;
     default:

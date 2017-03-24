@@ -3,15 +3,21 @@
 #include "walls.h"
 #include "graphics.h"
 
-/* wall locations */
-Walls V_Walls[5][6];
-Walls H_Walls[6][5];
-
-/* wall animation variables */
-Walls changedWall;
-int wallVar1, wallVar2; //position of animated wall
-int wallType; //type; 0 = horizontal, 1 = vertical
 int wallToggle = 0; //toggle variable; 0 = wall disabled, add wall, 1 = wall enabled, remove wall
+
+void initWalls() {
+  int i, j;
+
+  for (i = 0; i < 5; i++) {
+    for (j = 0; j < 6; j++) {
+      V_Walls[i][j].enabled = 0;
+      H_Walls[j][i].enabled = 0;
+      removeWall(V_Walls[i][j]);
+      removeWall(H_Walls[j][i]);
+    }
+  }
+
+}
 
 void drawWall(Walls w) {
 

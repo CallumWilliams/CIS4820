@@ -60,7 +60,6 @@ int playerObjectCollide(float p_x, float p_y, float p_z) {
         (int)p_y*-1 == ITEM_ARRAY[i].pos_y &&
         (int)p_z*-1 == ITEM_ARRAY[i].pos_z &&
         ITEM_ARRAY[i].enabled) {
-          printf("collision with object %d\n", i);
           removeObject(i);
           return (int)ITEM_ARRAY[i].ot;
         }
