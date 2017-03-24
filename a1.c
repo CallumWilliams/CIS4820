@@ -285,6 +285,7 @@ void draw2D() {
                     (screenWidth/4)+((int)projZ*4)+15,
                     (screenHeight/4)+((int)projX*4)+15);
 
+      //draw items
       for (i = 0; i < 7; i++) {
         if (ITEM_ARRAY[i].enabled)
           if (i == 0) set2Dcolour(white);
@@ -292,10 +293,10 @@ void draw2D() {
           else if (i == 3 || i == 4) set2Dcolour(blue);
           else set2Dcolour(black);
 
-          draw2Dbox((screenWidth/4)+ITEM_ARRAY[i].pos_z*2+5,
-                    (screenHeight/4)+ITEM_ARRAY[i].pos_x*2+5,
-                    (screenWidth/4)+(ITEM_ARRAY[i].pos_z*2)+15,
-                    (screenHeight/4)+(ITEM_ARRAY[i].pos_x*2)+15);
+          draw2Dbox((screenWidth/4)+ITEM_ARRAY[i].pos_z*4+5,
+                    (screenHeight/4)+ITEM_ARRAY[i].pos_x*4+5,
+                    (screenWidth/4)+(ITEM_ARRAY[i].pos_z*4)+15,
+                    (screenHeight/4)+(ITEM_ARRAY[i].pos_x*4)+15);
 
       }
 
@@ -420,6 +421,11 @@ float *la;
        if ((world[(int)((camera_x)*-1)][(int)(((camera_y)*-1)-0.1)][(int)((camera_z)*-1)] == 0) && !flycontrol) {
          camera_y+=0.1;
          setViewPosition(camera_x, camera_y, camera_z);
+       }
+
+       //in case a mob goes over an item, we need to redraw
+       for (i = 0; i < 7; i++) {
+         if (ITEM_ARRAY[i].enabled) drawItem(i);
        }
 
        /* mob movement */

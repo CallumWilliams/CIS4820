@@ -39,6 +39,28 @@ void generateObject(int OBJ_ID, OBJECT_TYPE t, int x, int y, int z) {
 
 }
 
+void drawItem(int OBJ_ID) {
+  
+  switch (ITEM_ARRAY[OBJ_ID].ot) {
+    case KEY:
+      world[ITEM_ARRAY[OBJ_ID].pos_x][ITEM_ARRAY[OBJ_ID].pos_y][ITEM_ARRAY[OBJ_ID].pos_z] = 5;
+      break;
+    case TELEPORT:
+      world[ITEM_ARRAY[OBJ_ID].pos_x][ITEM_ARRAY[OBJ_ID].pos_y][ITEM_ARRAY[OBJ_ID].pos_z] = 3;
+      break;
+    case BOUNCE:
+      world[ITEM_ARRAY[OBJ_ID].pos_x][ITEM_ARRAY[OBJ_ID].pos_y][ITEM_ARRAY[OBJ_ID].pos_z] = 1;
+      break;
+    case FALL_CUBE:
+      world[ITEM_ARRAY[OBJ_ID].pos_x][ITEM_ARRAY[OBJ_ID].pos_y][ITEM_ARRAY[OBJ_ID].pos_z] = 2;
+      break;
+    default:
+      printf("Unexpected OBJECT_TYPE %d\n", ITEM_ARRAY[OBJ_ID].ot);
+      exit(0);
+  }
+
+}
+
 void removeObject(int OBJ_ID) {
 
   int x, y, z;
