@@ -40,7 +40,7 @@ void generateObject(int OBJ_ID, OBJECT_TYPE t, int x, int y, int z) {
 }
 
 void drawItem(int OBJ_ID) {
-  
+
   switch (ITEM_ARRAY[OBJ_ID].ot) {
     case KEY:
       world[ITEM_ARRAY[OBJ_ID].pos_x][ITEM_ARRAY[OBJ_ID].pos_y][ITEM_ARRAY[OBJ_ID].pos_z] = 5;
@@ -88,5 +88,19 @@ int playerObjectCollide(float p_x, float p_y, float p_z) {
   }
 
   return -1;
+
+}
+
+int fallCubeAnimation(int x, int z, int KEY_FRAME) {
+
+  world[x+2][35-KEY_FRAME+1][z+2] = 0;
+  world[x-2][35-KEY_FRAME+1][z+2] = 0;
+  world[x+2][35-KEY_FRAME+1][z-2] = 0;
+  world[x-2][35-KEY_FRAME+1][z-2] = 0;
+
+  world[x+2][35-KEY_FRAME][z+2] = 5;
+  world[x-2][35-KEY_FRAME][z+2] = 5;
+  world[x+2][35-KEY_FRAME][z-2] = 5;
+  world[x-2][35-KEY_FRAME][z-2] = 5;
 
 }

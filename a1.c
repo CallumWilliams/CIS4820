@@ -20,6 +20,8 @@
 extern float camera_x = -7, camera_y = -30, camera_z = -7;
 extern float view_x, view_y, view_z;
 extern int KEY_COLLECTED = 0;
+int fallCubeTimer; //timer for fall cube function
+int fallCubeX, fallCubeZ;
 
   /* item variables */
 extern struct item ITEM_ARRAY[7];
@@ -158,7 +160,10 @@ void collisionResponse() {
       break;
     case 3:
       printf("Collected item - FALL_CUBE\n");
-      //FALL_CUBE CODE
+      fallCubeAnimation((int)camera_x*-1, (int)camera_z*-1, 0);
+      fallCubeTimer = 0;
+      fallCubeX = (int)camera_x*-1;
+      fallCubeZ = (int)camera_z*-1;
       break;
     default:
       //collision detection
@@ -332,6 +337,11 @@ void draw2D() {
 }
 
 void timedAnimation() {
+
+  if (fallCubeTimer < 10) {
+    fallCubeTimer++;
+    fallCubeAnimation(fallCubeX, fallCubeZ, fallCubeTimer);
+  }
 
   if (wallTimer == 0) selectWall();
   if (wallTimer >= 0 && wallTimer < 16) animateWall(wallTimer);
